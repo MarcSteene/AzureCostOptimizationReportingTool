@@ -32,11 +32,16 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
    - If any errors occur during deployment the script will terminate. Resolve the error and run the script again. It may be necessary to delete the Resource Group and any resources created.
 9. Navigate to the created Resource Group and select the `office365` API connection resource.
 10. In the list menu, select `Edit API Connection` and then select the `Authorize` button.
-11. Authenticate as the user whose mailbox you wish to use to distribute the reports.
-12. Assign the `Reader` role to the Automation Account's Managed Identity on any management groups and subscriptions you wish to be assessed. To assess all subscriptions in the tenant, assign the `Reader` role to the Tenant Root Management Group.
-13. Navigate to the `ACORT-Main` runbook and select `Start`.
-14. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
-15. If the email report is not received, refer to the troubleshooting steps below.
+![](./docs/authorizeAPIConnection.jpg)
+12. Authenticate as the user whose mailbox you wish to use to distribute the reports.
+13. Assign the `Reader` role to the Automation Account's Managed Identity on any management groups and subscriptions you wish to be assessed. To assess all subscriptions in the tenant, assign the `Reader` role to the Tenant Root Management Group.
+![](./docs/addRoleAssignment.jpg)
+![](./docs/readerRole.jpg)
+![](./docs/managedIdentity.jpg)
+![](./docs/managedIdentity2.jpg)
+15. Navigate to the `ACORT-Main` runbook and select `Start`.
+16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
+17. If the email report is not received, refer to the troubleshooting steps below.
 
 ## Troubleshooting
 1. Navigate to the deployed Automation Account.
