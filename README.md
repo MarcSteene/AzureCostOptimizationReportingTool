@@ -33,7 +33,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 9. Navigate to the created Resource Group and select the `office365` API connection resource.
 10. In the list menu, select `Edit API Connection` and then select the `Authorize` button.
 ![](./docs/authorizeAPIConnection.jpg)
-12. Authenticate as the user whose mailbox you wish to use to distribute the reports.
+12. Authenticate as the user whose mailbox you wish to use to distribute the reports and then select `Save`.
 13. Assign the `Reader` role to the Automation Account's Managed Identity on any management groups and subscriptions you wish to be assessed. To assess all subscriptions in the tenant, assign the `Reader` role to the Tenant Root Management Group.
 ![](./docs/addRoleAssignment.jpg)
 ![](./docs/readerRole.jpg)
