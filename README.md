@@ -5,7 +5,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Get an efficiency score for each subscription and total cost optimization potential ($).
 * Receive a recurring (weekly or monthly) email report.
 * Leverage cost data to understand optimization potential and determine remediation priority.
-* Includes all Azure Advisor recommendations.
+* Incorporates all Azure Advisor recommendations.
 
 ## Prerequisites
 * A user account with the following roles on a subscription:
