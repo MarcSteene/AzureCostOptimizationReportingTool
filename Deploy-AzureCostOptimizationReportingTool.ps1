@@ -1,21 +1,5 @@
 $ErrorActionPreference = "Stop"
 
-Function Show-OAuthWindow {
-    Add-Type -AssemblyName System.Windows.Forms
- 
-    $form = New-Object -TypeName System.Windows.Forms.Form -Property @{Width=600;Height=800}
-    $web  = New-Object -TypeName System.Windows.Forms.WebBrowser -Property @{Width=580;Height=780;Url=($url -f ($Scope -join "%20")) }
-    $DocComp  = {
-            $Global:uri = $web.Url.AbsoluteUri
-            if ($Global:Uri -match "error=[^&]*|code=[^&]*") {$form.Close() }
-    }
-    $web.ScriptErrorsSuppressed = $true
-    $web.Add_DocumentCompleted($DocComp)
-    $form.Controls.Add($web)
-    $form.Add_Shown({$form.Activate()})
-    $form.ShowDialog() | Out-Null
-}
-
 Write-Host "Reading and validating configuration file..." -ForegroundColor Yellow
 Get-Content ".\config.txt" | ForEach-Object -begin { $config=@{} } -process { $k = [regex]::split($_,'='); if(($k[0].CompareTo("") -ne 0) -and ($k[0].StartsWith("[") -ne $True)) { $config.Add($k[0], $k[1]) } }
 
@@ -106,30 +90,6 @@ $apiConnection = New-AzResource -Properties @{ `
      -Location $configDeploymentLocation `
      -Force
 
-$parameters = @{
-    "parameters" = ,@{
-        "parameterName"= "token";
-        "redirectUrl"= "https://ema1.exp.azure.com/ema/default/authredirect"
-    }
-}
-
-Write-Host "You will be prompted to authenticate, this account will be the mailbox used for report distribution. Press any key to continue."
-$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
-
-$consentResponse = Invoke-AzResourceAction -Action "listConsentLinks" -ResourceId $apiConnection.ResourceId -Parameters $parameters -Force
-$url = $consentResponse.Value.Link 
-
-Show-OAuthWindow -URL $url
-
-$regex = '(code=)(.*)$'
-    $code  = ($uri | Select-string -pattern $regex).Matches[0].Groups[2].Value
-
-if (-Not [string]::IsNullOrEmpty($code)) {
-    $parameters = @{ }
-    $parameters.Add("code", $code)
-    Invoke-AzResourceAction -Action "confirmConsentCode" -ResourceId $apiConnection.ResourceId -Parameters $parameters -Force -ErrorAction Ignore
-}
-
 $tempParametersFileName = ".\LogicAppParameters-$(Get-Random).json"
 
 (Get-Content -path .\LogicAppParameters.json) | ForEach-Object {
@@ -200,5 +160,5 @@ New-AzRoleAssignment -ObjectId $automationAccount.Identity.PrincipalId -RoleDefi
 Write-Host "Assigning Managed Identity 'Automation Runbook Operator' role on Automation Account..." -ForegroundColor Yellow
 New-AzRoleAssignment -ObjectId $automationAccount.Identity.PrincipalId -RoleDefinitionName "Automation Runbook Operator" -Scope $automationAccount.ResourceId
 
-Write-Host "Deployment complete. You must assign the Automation Account Managed Identity the 'Reader' role on all Subscriptions and Management Groups to be included in the assessment scope. See the documentation for details. Press any key to continue."
+Write-Host "Deployment complete. Additional configuration steps are required, see the documentation for details. Press any key to continue."
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
