@@ -4,7 +4,7 @@ param (
 
 $VerbosePreference = "SilentlyContinue"
 
-Write-Verbose "Starting child Runbook..." -Verbose
+Write-Verbose "Starting..." -Verbose
 
 # Import Runbooks
 ###############################################################################
