@@ -31,7 +31,7 @@ $config.Keys | ForEach-Object {
 }
 
 do {
-    $confirm = Read-Host -Prompt "Please review the above configuration. Continue deployment? (Y/N)"
+    $confirm = Read-Host -Prompt "Please review the above configuration and ensure your account has at least [Contributor and User Access Administrator] or [Owner] roles(s) on the target subscription. Continue deployment? (Y/N)"
 
     if($confirm -eq "Y") {
         Write-Host "Beginning deployment..." -ForegroundColor Green
@@ -54,12 +54,6 @@ $configAutomationAccountName = $config["Automation Account Name"]
 $configDeploymentLocation = $config["Deployment Location"]
 $configReportFrequency = $config["Report Frequency"]
 $configMailRecipients = $config["Mail Recipients"]
-
-Write-Host "You will be prompted to authenticate to Azure. Ensure your account has at least [Contributor and User Access Administrator] or [Owner] roles(s) on the target subscription.  Press any key to continue."
-$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
-
-Write-Host "Authenticating to Azure..." -ForegroundColor Yellow
-Connect-AzAccount
 
 Write-Host "Checking for valid subscription: $configSubscriptionName" -ForegroundColor Yellow
 $subscriptions = Get-AzSubscription
