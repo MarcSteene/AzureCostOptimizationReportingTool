@@ -1,0 +1,11 @@
+{
+    "$connections": {
+        "value": {
+            "office365": {
+                "connectionId": "!!ConnectionId",
+                "connectionName": "office365",
+                "id": "!!ApiId"
+            }
+        }
+    }
+}

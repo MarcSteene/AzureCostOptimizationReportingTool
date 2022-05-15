@@ -1,0 +1,8 @@
+[Configuration]
+Subscription Name=Your Subscription Name
+Resource Group Name=RG-AzureCostOptimizationReportingTool
+Logic App Name=LA-SendMail
+Automation Account Name=AA-AzureCostOptimizationReportingTool
+Deployment Location=North Europe
+Report Frequency=Monthly
+Mail Recipients=recipient1@yourdomain.com; recipient2@yourdomain.com;
