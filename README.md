@@ -9,8 +9,8 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ## Prerequisites
 * A user account with the following role(s) on a subscription:
-  * Contributor and User Access Administrator
-  * OR Owner
+  * `Contributor` and `User Access Administrator`
+  * OR `Owner`
 * A user with a mailbox to send the email report.
 
 ## Deployment
