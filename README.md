@@ -39,7 +39,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 ![](./docs/readerRole.jpg)
 ![](./docs/managedIdentity.jpg)
 ![](./docs/managedIdentity2.jpg)
-15. Navigate to the `ACORT-Main` runbook and select `Start`.
+15. Once the `Reader` role has been assigned to the desired assessment scopes, navigate to the `ACORT-Main` runbook and select `Start`.
 16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
 
