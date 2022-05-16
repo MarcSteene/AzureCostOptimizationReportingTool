@@ -15,10 +15,9 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ## Deployment
 1. Open the Azure Portal and open a Cloud Shell (PowerShell). If this is your first time using Cloud Shell, it may require set up.
-
-![](./docs/cloudShell.jpg)
+<br>![](./docs/cloudShell.jpg)</br>
 2. Run `git clone https://github.com/MarcSteene/AzureCostOptimizationReportingTool.git azurecostoptimizationreportingtool`
-![](.docs/gitClone.jpg)
+<br>![](.docs/gitClone.jpg)</br>
 3. Run `cd ./azurecostoptimizationreportingtool/`
 4. Run `code config.txt`
 5. Update the configuration as required:
@@ -34,20 +33,20 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
    - If any errors occur during deployment the script will terminate. Resolve the error and run the script again. It may be necessary to delete the Resource Group and any resources created.
 8. Navigate to the created Resource Group and select the `office365` API connection resource.
 9. In the list menu, select `Edit API Connection` and then select the `Authorize` button.
-![](./docs/authorizeAPIConnection.jpg)
+<br>![](./docs/authorizeAPIConnection.jpg)</br>
 10. Authenticate as the user whose mailbox you wish to use to distribute the reports and then select `Save`.
 11. Assign the `Reader` role to the Automation Account's Managed Identity on any management groups and subscriptions you wish to be assessed. To assess all subscriptions in the tenant, assign the `Reader` role to the Tenant Root Management Group. Go to your selected scope(s) and go to the `Access Control (IAM)` item. Select `Add` then select `Add role assignment`.
-![](./docs/addRoleAssignment.jpg)
-Select the `Reader` role and select `Next`.
-![](./docs/readerRole.jpg)
-Select the `Managed Identity` radio button then select `+ Select members`. A flyout window will appear on the right side of the screen.
-![](./docs/managedIdentity.jpg)
-In the Subscription dropdown, select the subscription you deployed the tool to. In the Managed Identity dropdown, select Automation Account under System-assigned managed identity. Select the managed identity associated with the tool's Automation Account. Select the `Select` button, and then `Review + assign`.
-![](./docs/managedIdentity2.jpg)
-12. Once the `Reader` role has been assigned to the desired assessment scopes, navigate to the `ACORT-Main` runbook and select `Start`.
-![](./docs/startRunbook.jpg)
-13. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
-14. If the email report is not received, refer to the troubleshooting steps below.
+<br>![](./docs/addRoleAssignment.jpg)</br>
+12. Select the `Reader` role and select `Next`.
+<br>![](./docs/readerRole.jpg)</br>
+13. Select the `Managed Identity` radio button then select `+ Select members`. A flyout window will appear on the right side of the screen.
+<br>![](./docs/managedIdentity.jpg)</br>
+14. In the Subscription dropdown, select the subscription you deployed the tool to. In the Managed Identity dropdown, select Automation Account under System-assigned managed identity. Select the managed identity associated with the tool's Automation Account. Select the `Select` button, and then `Review + assign`.
+<br>![](./docs/managedIdentity2.jpg)</br>
+15. Once the `Reader` role has been assigned to the desired assessment scopes, navigate to the `ACORT-Main` runbook and select `Start`.
+<br>![](./docs/startRunbook.jpg)</br>
+16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
+17. If the email report is not received, refer to the troubleshooting steps below.
 
 ## Troubleshooting
 1. Navigate to the deployed Automation Account.
