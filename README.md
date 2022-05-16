@@ -35,10 +35,13 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 9. In the list menu, select `Edit API Connection` and then select the `Authorize` button.
 ![](./docs/authorizeAPIConnection.jpg)
 10. Authenticate as the user whose mailbox you wish to use to distribute the reports and then select `Save`.
-11. Assign the `Reader` role to the Automation Account's Managed Identity on any management groups and subscriptions you wish to be assessed. To assess all subscriptions in the tenant, assign the `Reader` role to the Tenant Root Management Group.
+11. Assign the `Reader` role to the Automation Account's Managed Identity on any management groups and subscriptions you wish to be assessed. To assess all subscriptions in the tenant, assign the `Reader` role to the Tenant Root Management Group. Go to your selected scope(s) and go to the `Access Control (IAM)` item. Select `Add` then select `Add role assignment`.
 ![](./docs/addRoleAssignment.jpg)
+Select the `Reader` role and select `Next`.
 ![](./docs/readerRole.jpg)
+Select the `Managed Identity` radio button then select `+ Select members`. A flyout window will appear on the right side of the screen.
 ![](./docs/managedIdentity.jpg)
+In the Subscription dropdown, select the subscription you deployed the tool to. In the Managed Identity dropdown, select Automation Account under System-assigned managed identity. Select the managed identity associated with the tool's Automation Account. Select the `Select` button, and then `Review + assign`.
 ![](./docs/managedIdentity2.jpg)
 12. Once the `Reader` role has been assigned to the desired assessment scopes, navigate to the `ACORT-Main` runbook and select `Start`.
 ![](./docs/startRunbook.jpg)
