@@ -1,7 +1,7 @@
 # Azure Cost Optimization Reporting Tool
 The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool designed to improve the cost efficiency of your Azure deployments. It performs a multi-subscription assessment of your Azure resources against Microsoft's cost optimization best practices defined in the [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/cost/) and [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/get-started/manage-costs). A recurring email report is generated containing optimizations for each subscription with associated cost data pulled from the previous month.
 
-* Assess your Azure workloads against 27 Microsoft cost optimization best practices scoped to subscriptions, management groups, or the entire tenant.
+* Assess your Azure workloads against 28 Microsoft cost optimization best practices scoped to subscriptions, management groups, or the entire tenant.
 * Get an efficiency score for each subscription and total cost optimization potential ($).
 * Receive a recurring (weekly or monthly) email report.
 * Leverage cost data to understand optimization potential and determine remediation priority.
@@ -66,7 +66,8 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Windows VM Scale Sets without Hybrid Benefit
 * SQL Databases not using Hybrid Benefit
 * SQL Managed Instances not using Hybrid Benefit
-* Linux VMs not using Hybrid Benefit (Red Hat Enterprise Linux and SUSE Linux Enterprise Server)
+* Red Hat Enterprise Linux VMs not using Hybrid Benefit
+* SUSE Linux Enterprise Server VMs not using Hybrid Benefit
 * VMs deallocated for more than 90 days
 * Recovery Services Vaults in Dev/Test subscriptions using Geo-Redundant Storage (GRS)
 * Snapshots older than 1 year
