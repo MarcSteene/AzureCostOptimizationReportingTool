@@ -19,10 +19,15 @@ $recommendationTable = @{
 		EstimatedSavingsRatio = 0.64
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/automation/automation-solution-vm-management"
 	}
-	"WindowsHybridBenefit" = @{
+	"WindowsVMHybridBenefit" = @{
 		RecommendationDescription = "Enable hybrid license benefit (AHUB) for Windows VM if you have licenses through Software Assurance"
 		EstimatedSavingsRatio = 0.44
-		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/hybrid-benefit/"
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/virtual-machines/windows/hybrid-use-benefit-licensing"
+	}
+	"WindowsVMSSHybridBenefit" = @{
+		RecommendationDescription = "Enable hybrid license benefit (AHUB) for Windows VM Scale Sets if you have licenses through Software Assurance"
+		EstimatedSavingsRatio = 0.44
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/virtual-machines/windows/hybrid-use-benefit-licensing"
 	}
 	"StaleVM" = @{
 		RecommendationDescription = "Consider deleting potentially stale VM (deallocated for 90+ days) and any attached disks"
@@ -133,5 +138,10 @@ $recommendationTable = @{
 		RecommendationDescription = "No subscriptions using the Dev/Test subscription offer found. Use the Dev/Test offer for your non-production subscriptions for significant discounts"
 		EstimatedSavingsRatio = $null
 		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/offers/ms-azr-0148p/"
+	}
+	"NonDefaultLogAnalyticsRetention" = @{
+		RecommendationDescription = "Review Log Analytics Workspace with a non-default (> 30 days) data retention period and consider whether this is required"
+		EstimatedSavingsRatio = $null
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs"
 	}
 }

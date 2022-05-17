@@ -4,7 +4,7 @@ param (
 
 $VerbosePreference = "SilentlyContinue"
 
-Write-Verbose "Starting..." -Verbose
+Write-Verbose "Starting runbook..." -Verbose
 
 # Import Runbooks
 ###############################################################################
@@ -38,7 +38,9 @@ $billingQuery = @"
 				"Microsoft.Sql/managedInstances",
 				"Microsoft.Sql/servers",
 				"Microsoft.Sql/servers/databases",
-				"Microsoft.Compute/snapshots"
+				"Microsoft.Compute/snapshots",
+				"Microsoft.Compute/virtualMachineScaleSets",
+				"Microsoft.OperationalInsights/workspaces"
 			]
 		}
 	},
@@ -91,6 +93,7 @@ $subscriptions | ForEach-Object {
 	Add-UnattachedManagedDiskRecommendations -SubscriptionName $_.Name
 	Add-VMStoppedPowerStateRecommendations -SubscriptionName $_.Name
 	Add-NonAHBWindowsVMRecommendations -SubscriptionName $_.Name
+	Add-NonAHBWindowsVMSSRecommendations -SubscriptionName $_.Name
 	Add-StaleVMRecommendations -SubscriptionName $_.Name
 	Add-EmptyAvailabilitySetRecommendations -SubscriptionName $_.Name
 	Add-UnattachedNetworkInterfaceRecommendations -SubscriptionName $_.Name
@@ -102,6 +105,7 @@ $subscriptions | ForEach-Object {
 	Add-StorageAccountLifecycleManagementRecommendations -SubscriptionName $_.Name
 	Add-NoneAHBLinuxVMRecommendations -SubscriptionName $_.Name
 	Add-StaleSnapshotRecommendations -SubscriptionName $_.Name
+	Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
 
 	if($_.SubscriptionPolicies.QuotaId.Contains("DevTest")) {
 		Add-DevVMNoAutoshutdownScheduleRecommendations -SubscriptionName $_.Name

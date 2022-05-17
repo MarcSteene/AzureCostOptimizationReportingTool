@@ -123,6 +123,24 @@ function Add-UnattachedPublicIpRecommendations {
 	}
 }
 
+function Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations {
+	    Param(
+        [parameter(Mandatory=$true)]
+        [String] $subscriptionName 
+    )
+	Write-Verbose "Checking for Log Analytics Workspaces with non-default (>30 days) data retention period..." -Verbose
+
+	Get-AzOperationalInsightsWorkspace | Where-Object { $_.retentionInDays -gt 30 } `
+	| ForEach-Object {
+		Add-Recommendation `
+		-SubscriptionName $subscriptionName `
+		-ResourceId $_.ResourceId `
+		-ResourceName $_.Name `
+		-ResourceGroupName $_.ResourceGroupName `
+		-RecommendationType "NonDefaultLogAnalyticsRetention"
+	}
+}
+
 function Add-UnattachedManagedDiskRecommendations {
     Param(
         [parameter(Mandatory=$true)]
@@ -198,7 +216,26 @@ function Add-NonAHBWindowsVMRecommendations {
 		-ResourceId $_.Id `
 		-ResourceName $_.Name `
 		-ResourceGroupName $_.ResourceGroupName `
-		-RecommendationType "WindowsHybridBenefit"
+		-RecommendationType "WindowsVMHybridBenefit"
+	}
+}
+
+function Add-NonAHBWindowsVMSSRecommendations {
+    Param(
+        [parameter(Mandatory=$true)]
+        [String] $subscriptionName 
+    )
+	Write-Verbose "Checking for Windows VM Scale Sets without Azure Hybrid Benefit enabled..." -Verbose
+
+	Get-AzVmss `
+	| Where-Object { !$_.VirtualMachineProfile.LicenseType -and $_.VirtualMachineProfile.OsProfile.WindowsConfiguration } `
+	| ForEach-Object {
+		Add-Recommendation `
+		-SubscriptionName $subscriptionName `
+		-ResourceId $_.Id `
+		-ResourceName $_.Name `
+		-ResourceGroupName $_.ResourceGroupName `
+		-RecommendationType "WindowsVMSSHybridBenefit"
 	}
 }
 
