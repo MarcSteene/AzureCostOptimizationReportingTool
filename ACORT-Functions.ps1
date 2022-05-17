@@ -625,22 +625,41 @@ function Add-StorageAccountLifecycleManagementRecommendations {
 	}
 }
 
-function Add-NoneAHBLinuxVMRecommendations {
+function Add-NoneAHBRHELVMRecommendations {
     Param(
         [parameter(Mandatory=$true)]
         [String] $subscriptionName 
     )
-	Write-Verbose "Checking for Linux VMs without Azure Hybrid Benefit enabled..." -Verbose
+	Write-Verbose "Checking for Red Hat Enterprise Linux VMs without Hybrid Benefit enabled..." -Verbose
 
 	$vmCache `
-	| Where-Object { $_.StorageProfile.OsDisk.OsType -eq "Linux" -and !$_.LicenseType } `
+	| Where-Object { $_.StorageProfile.ImageReference.Publisher -eq "RedHat" -and $_.LicenseType -ne "RHEL_BYOS" } `
 	| ForEach-Object {
 		Add-Recommendation `
 		-SubscriptionName $subscriptionName `
 		-ResourceId $_.Id `
 		-ResourceName $_.Name `
 		-ResourceGroupName $_.ResourceGroupName `
-		-RecommendationType "LinuxHybridBenefit"
+		-RecommendationType "RHELHybridBenefit"
+	}
+}
+
+function Add-NoneAHBSLESVMRecommendations {
+    Param(
+        [parameter(Mandatory=$true)]
+        [String] $subscriptionName 
+    )
+	Write-Verbose "Checking for SUSE Linux Enterprise Server VMs without Hybrid Benefit enabled..." -Verbose
+
+	$vmCache `
+	| Where-Object { $_.StorageProfile.ImageReference.Publisher -eq "SUSE" -and $_.LicenseType -ne "SLES_BYOS" } `
+	| ForEach-Object {
+		Add-Recommendation `
+		-SubscriptionName $subscriptionName `
+		-ResourceId $_.Id `
+		-ResourceName $_.Name `
+		-ResourceGroupName $_.ResourceGroupName `
+		-RecommendationType "SLESHybridBenefit"
 	}
 }
 

@@ -119,9 +119,14 @@ $recommendationTable = @{
 		EstimatedSavingsRatio = 0.8
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-overview"
 	}
-	"LinuxHybridBenefit" = @{
-		RecommendationDescription = "Consider whether Azure Hybrid Use Benefit could be enabled for this Linux VM (SUSE Linux Enterprise Server or Red Hat Enterprise Linux images)"
-		EstimatedSavingsRatio = $null
+	"RHELHybridBenefit" = @{
+		RecommendationDescription = "Enable Hybrid Benefit for Red Hat Enterprise Linux VMs if appropriately licensed"
+		EstimatedSavingsRatio = 0.25
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/virtual-machines/linux/azure-hybrid-benefit-linux"
+	}
+	"SLESHybridBenefit" = @{
+		RecommendationDescription = "Enable Hybrid Benefit for SUSE Linux Enterprise Server VMs if appropriately licensed"
+		EstimatedSavingsRatio = 0.05
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/virtual-machines/linux/azure-hybrid-benefit-linux"
 	}
 	"WellArchitectedFramework" = @{

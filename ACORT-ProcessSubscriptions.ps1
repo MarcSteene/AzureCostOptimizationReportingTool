@@ -103,7 +103,8 @@ $subscriptions | ForEach-Object {
 	Add-NonAHBSqlManagedInstanceRecommendations -SubscriptionName $_.Name
 	Add-V1StorageAccountRecommendations -SubscriptionName $_.Name
 	Add-StorageAccountLifecycleManagementRecommendations -SubscriptionName $_.Name
-	Add-NoneAHBLinuxVMRecommendations -SubscriptionName $_.Name
+	Add-NoneAHBRHELVMRecommendations -SubscriptionName $_.Name
+	Add-NoneAHBSLESVMRecommendations -SubscriptionName $_.Name
 	Add-StaleSnapshotRecommendations -SubscriptionName $_.Name
 	Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
 
