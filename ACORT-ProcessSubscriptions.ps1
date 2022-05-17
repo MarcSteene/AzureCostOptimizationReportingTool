@@ -20,6 +20,7 @@ $script:vmCache = @()
 $script:diskCache = @()
 $script:storageAccountCache = @()
 $script:recoveryServicesVaultCache = @()
+$script:logAnalyticsWorkspaceCache= @()
 
 $billingQuery = @"
 {
@@ -107,6 +108,8 @@ $subscriptions | ForEach-Object {
 	Add-NoneAHBSLESVMRecommendations -SubscriptionName $_.Name
 	Add-StaleSnapshotRecommendations -SubscriptionName $_.Name
 	Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
+	Add-LogAnalyticsWorkspaceCommitmentTierRecommendations -SubscriptionName $_.Name
+	Add-LogAnalyticsWorkspacePerNodeTierRecommendations -SubscriptionName $_.Name
 
 	if($_.SubscriptionPolicies.QuotaId.Contains("DevTest")) {
 		Add-DevVMNoAutoshutdownScheduleRecommendations -SubscriptionName $_.Name

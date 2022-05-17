@@ -68,6 +68,12 @@ function Initialize-RecoveryServicesVaultCache {
 	$script:recoveryServicesVaultCache = Get-AzRecoveryServicesVault
 }
 
+function Initialize-LogAnalyticsWorkspaceCache {
+	Write-Verbose "Building Log Analytics Workspace cache..." -Verbose
+
+	$script:logAnalyticsWorkspaceCache = Get-AzOperationalInsightsWorkspace
+}
+
 function Add-BillingData {
     Param(
         [parameter(Mandatory=$true)]
@@ -124,13 +130,13 @@ function Add-UnattachedPublicIpRecommendations {
 }
 
 function Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations {
-	    Param(
+	Param(
         [parameter(Mandatory=$true)]
         [String] $subscriptionName 
     )
 	Write-Verbose "Checking for Log Analytics Workspaces with non-default (>30 days) data retention period..." -Verbose
 
-	Get-AzOperationalInsightsWorkspace | Where-Object { $_.retentionInDays -gt 30 } `
+	$logAnalyticsWorkspaceCache | Where-Object { $_.retentionInDays -gt 30 } `
 	| ForEach-Object {
 		Add-Recommendation `
 		-SubscriptionName $subscriptionName `
@@ -138,6 +144,54 @@ function Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations {
 		-ResourceName $_.Name `
 		-ResourceGroupName $_.ResourceGroupName `
 		-RecommendationType "NonDefaultLogAnalyticsRetention"
+	}
+}
+
+function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
+	    Param(
+        [parameter(Mandatory=$true)]
+        [String] $subscriptionName 
+    )
+	Write-Verbose "Checking for Log Analytics Workspaces on Pay-as-you-go SKU with 100GB+ average daily ingestion..." -Verbose
+
+	$query = @'
+		Usage
+		| where TimeGenerated > ago(31d) and TimeGenerated < ago(1d)
+		| where IsBillable == True
+		| summarize TotalGBytes =round(sum(Quantity/(1024)),2) by bin(TimeGenerated, 1d)
+		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
+'@
+
+	$logAnalyticsWorkspaceCache | Where-Object { $_.Name -notlike "DefaultWorkspace-*" -and $_.Sku.contains("pergb") } `
+	| ForEach-Object {
+		$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
+
+		if($averageDailyIngestion -ne "NaN" -and $averageDailyIngestion -gt 100) {
+			Add-Recommendation `
+			-SubscriptionName $subscriptionName `
+			-ResourceId $_.ResourceId `
+			-ResourceName $_.Name `
+			-ResourceGroupName $_.ResourceGroupName `
+			-RecommendationType "LogAnalyticsWorkspaceCommitmentTier"
+		}
+	}
+}
+
+function Add-LogAnalyticsWorkspacePerNodeTierRecommendations {
+	Param(
+		[parameter(Mandatory=$true)]
+		[String] $subscriptionName 
+    )
+	Write-Verbose "Checking for Log Analytics Workspaces with legacy Per-Node pricing tier..." -Verbose
+
+	$logAnalyticsWorkspaceCache | Where-Object { $_.sku -eq "pernode" } `
+	| ForEach-Object {
+		Add-Recommendation `
+		-SubscriptionName $subscriptionName `
+		-ResourceId $_.ResourceId `
+		-ResourceName $_.Name `
+		-ResourceGroupName $_.ResourceGroupName `
+		-RecommendationType "LogAnalyticsPerNodePricingTier"
 	}
 }
 

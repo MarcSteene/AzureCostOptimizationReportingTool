@@ -149,4 +149,14 @@ $recommendationTable = @{
 		EstimatedSavingsRatio = $null
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs"
 	}
+	"LogAnalyticsWorkspaceCommitmentTier" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a Commitment SKU for discounts"
+		EstimatedSavingsRatio = 0.85
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsPerNodePricingTier" = @{
+		RecommendationDescription = "Use the Microsoft-provided query to determine whether it would be cheaper to remain on the Per-Node pricing tier or change to Pay-as-you-go"
+		EstimatedSavingsRatio = $null
+		MicrosoftGuidance = "https://docs.microsoft.com/en-gb/azure/azure-monitor/logs/cost-logs#evaluate-the-legacy-per-node-pricing-tier"
+	}
 }
