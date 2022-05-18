@@ -116,6 +116,8 @@ $childOutput | Where-Object { $_.OutputType -eq "SubscriptionMetadata" } | ForEa
 	$subscriptionMetadata += ConvertTo-Object($_)
 }
 
+$subscriptionMetadata = $subscriptionMetadata | Sort-Object -Property TotalRecommendationCount -Descending
+
 $childOutput | Where-Object { $_.OutputType -eq "Recommendation" } | ForEach-Object {
 	$script:allRecommendations += ConvertTo-Object($_)
 }
