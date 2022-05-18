@@ -837,7 +837,7 @@ function Get-SubscriptionMetadata {
         'Authorization' = "Bearer $($azToken)"
     }
 
-	$consumptionUri = "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.CostManagement/query?api-version=2021-10-01"
+	$costManagementUri = "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.CostManagement/query?api-version=2021-10-01"
 
     $query = @"
     {
@@ -855,8 +855,15 @@ function Get-SubscriptionMetadata {
     }
 "@
 
-	$costLastMonthUSD = (Invoke-RestMethod -Uri $consumptionUri -Method Post -Body $query -Headers $headers).properties.rows[0][0]
-	$costLastMonthUSD = [math]::Round($costLastMonthUSD,2)
+	$response = Invoke-RestMethod -Uri $costManagementUri -Method Post -Body $query -Headers $headers
+
+	if($response.properties.rows) {
+		$costLastMonthUSD = $response.properties.rows[0][0]
+		$costLastMonthUSD = [math]::Round($costLastMonthUSD,2)
+	}
+	else {
+		$costLastMonthUSD = "No billing data available"
+	}
 
 	$totalRecommendationCount = 0
 	$estimatedMonthlySavings = @{}
@@ -875,7 +882,15 @@ function Get-SubscriptionMetadata {
 		}
 	}
 
-	$subscriptionEfficiency = (($costLastMonthUSD - $estimatedMonthlySavings["USD"]) / $costLastMonthUSD).ToString("P")
+	if($costLastMonthUSD -eq "No billing data available") {
+		$subscriptionEfficiency = "No billing data available"
+	}
+	elseif($costLastMonthUSD -eq 0) {
+		$subscriptionEfficiency = "100.00%"
+	}
+	else {
+		$subscriptionEfficiency = (($costLastMonthUSD - $estimatedMonthlySavings["USD"]) / $costLastMonthUSD).ToString("P")
+	}
 
 	$metadata = [pscustomobject]@{
 		OutputType = "SubscriptionMetadata"
