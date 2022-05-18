@@ -882,11 +882,8 @@ function Get-SubscriptionMetadata {
 		}
 	}
 
-	if($costLastMonthUSD -eq "No billing data available") {
+	if($costLastMonthUSD -eq "No billing data available" -or $costLastMonthUSD -eq 0) {
 		$subscriptionEfficiency = "No billing data available"
-	}
-	elseif($costLastMonthUSD -eq 0) {
-		$subscriptionEfficiency = "100.00%"
 	}
 	else {
 		$subscriptionEfficiency = (($costLastMonthUSD - $estimatedMonthlySavings["USD"]) / $costLastMonthUSD).ToString("P")
