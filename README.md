@@ -13,7 +13,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * A user with `User Access Administrator` or `Owner` on the subscriptions or management groups to be included in the assessment.
 
 ## Deployment
-<b>[Video deployment guide](https://www.youtube.com/watch?v=_YY9VsRaJ0Q)</b>
+<b>[Video deployment guide (YouTube)](https://www.youtube.com/watch?v=_YY9VsRaJ0Q)</b>
 
 1. Open the Azure Portal and open a Cloud Shell (PowerShell). If this is your first time using Cloud Shell, it may require set up.
 <br>![](./docs/cloudShell.jpg)</br>
