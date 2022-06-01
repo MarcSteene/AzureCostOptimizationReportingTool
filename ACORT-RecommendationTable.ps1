@@ -154,14 +154,84 @@ $recommendationTable = @{
 		EstimatedSavingsRatio = $null
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/sentinel/billing?tabs=commitment-tier#analytics-logs"
 	}
-	"LogAnalyticsWorkspaceCommitmentTier" = @{
-		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a Commitment SKU for discounts"
-		EstimatedSavingsRatio = 0.85
+	"LogAnalyticsWorkspaceCommitmentTier100GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a 100GB Commitment SKU for a 15% discount"
+		EstimatedSavingsRatio = 0.15
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
 	}
-	"SentinelWorkspaceCommitmentTier" = @{
-		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a Commitment SKU for discounts"
+	"LogAnalyticsWorkspaceCommitmentTier200GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 200GB+ from Pay-as-you-go SKU to a 200GB Commitment SKU for a 20% discount"
+		EstimatedSavingsRatio = 0.2
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsWorkspaceCommitmentTier300GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 300GB+ from Pay-as-you-go SKU to a 300GB Commitment SKU for a 22% discount"
+		EstimatedSavingsRatio = 0.22
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsWorkspaceCommitmentTier400GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 400GB+ from Pay-as-you-go SKU to a 400GB Commitment SKU for a 23% discount"
+		EstimatedSavingsRatio = 0.23
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsWorkspaceCommitmentTier500GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 500GB+ from Pay-as-you-go SKU to a 500GB Commitment SKU for a 25% discount"
+		EstimatedSavingsRatio = 0.25
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsWorkspaceCommitmentTier1000GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 1000GB+ from Pay-as-you-go SKU to a 1000GB Commitment SKU for a 26% discount"
+		EstimatedSavingsRatio = 0.26
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsWorkspaceCommitmentTier2000GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 2000GB+ from Pay-as-you-go SKU to a 2000GB Commitment SKU for a 28% discount"
+		EstimatedSavingsRatio = 0.28
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"LogAnalyticsWorkspaceCommitmentTier5000GB" = @{
+		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 5000GB+ from Pay-as-you-go SKU to a 5000GB Commitment SKU for a 30% discount"
+		EstimatedSavingsRatio = 0.3
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"SentinelWorkspaceCommitmentTier100GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a 100GB Commitment SKU for a 50% discount"
 		EstimatedSavingsRatio = 0.5
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier200GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 200GB+ from Pay-as-you-go SKU to a 200GB Commitment SKU for a 55% discount"
+		EstimatedSavingsRatio = 0.55
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier300GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 300GB+ from Pay-as-you-go SKU to a 300GB Commitment SKU for a 57% discount"
+		EstimatedSavingsRatio = 0.57
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier400GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 400GB+ from Pay-as-you-go SKU to a 400GB Commitment SKU for a 58% discount"
+		EstimatedSavingsRatio = 0.58
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier500GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 500GB+ from Pay-as-you-go SKU to a 500GB Commitment SKU for a 60% discount"
+		EstimatedSavingsRatio = 0.6
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier1000GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 1000GB+ from Pay-as-you-go SKU to a 1000GB Commitment SKU for a 61% discount"
+		EstimatedSavingsRatio = 0.61
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier2000GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 2000GB+ from Pay-as-you-go SKU to a 2000GB Commitment SKU for a 63% discount"
+		EstimatedSavingsRatio = 0.63
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"SentinelWorkspaceCommitmentTier5000GB" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 5000GB+ from Pay-as-you-go SKU to a 5000GB Commitment SKU for a 65% discount"
+		EstimatedSavingsRatio = 0.65
 		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
 	}
 	"LogAnalyticsPerNodePricingTier" = @{
