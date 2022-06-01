@@ -234,6 +234,26 @@ $recommendationTable = @{
 		EstimatedSavingsRatio = 0.65
 		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
 	}
+	"SentinelWorkspaceCommitmentTierIncrease" = @{
+		RecommendationDescription = "Consider increasing Sentinel Workspace commitment tier for an additional discount"
+		EstimatedSavingsRatio = 0.02
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"LogAnalyticsWorkspaceCommitmentTierIncrease" = @{
+		RecommendationDescription = "Consider increasing Log Analytics Workspace commitment tier for an additional discount"
+		EstimatedSavingsRatio = 0.02
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"SentinelWorkspaceCommitmentTierDecrease" = @{
+		RecommendationDescription = "Sentinel Workspace has 100GB+ lower average daily data ingestion than current commitment tier. Consider whether the commitment tier needs to be reduced"
+		EstimatedSavingsRatio = $null
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
+	}
+	"LogAnalyticsWorkspaceCommitmentTierDecrease" = @{
+		RecommendationDescription = "Log Analytics Workspace has 100GB+ lower average daily data ingestion than current commitment tier. Consider whether the commitment tier needs to be reduced"
+		EstimatedSavingsRatio = $null
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
 	"LogAnalyticsPerNodePricingTier" = @{
 		RecommendationDescription = "Use the Microsoft-provided query to determine whether it would be cheaper to remain on the Per-Node pricing tier or change to Pay-as-you-go"
 		EstimatedSavingsRatio = $null

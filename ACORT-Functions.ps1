@@ -189,74 +189,89 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
 		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
 '@
 
-	$logAnalyticsWorkspaceCache | Where-Object { $_.Sku.contains("pergb") } `
-	| ForEach-Object {
+	$logAnalyticsWorkspaceCache | ForEach-Object {
 		$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
 		if($averageDailyIngestion -ne "NaN") {
-			if($averageDailyIngestion -gt 5000) {
+			if($_.Sku.contains("pergb")) {
+				if($averageDailyIngestion -gt 5000) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier5000GB"
+				}
+				elseif($averageDailyIngestion -gt 2000) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier2000GB"
+				}			
+				elseif($averageDailyIngestion -gt 1000) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier1000GB"
+				}
+				elseif($averageDailyIngestion -gt 500) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier500GB"
+				}			
+				elseif($averageDailyIngestion -gt 400) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier400GB"
+				}			
+				elseif($averageDailyIngestion -gt 300) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier300GB"
+				}
+				elseif($averageDailyIngestion -gt 200) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier200GB"
+				}
+				elseif($averageDailyIngestion -gt 100) {
+					Add-Recommendation `
+					-SubscriptionName $subscriptionName `
+					-ResourceId $_.ResourceId `
+					-ResourceName $_.Name `
+					-ResourceGroupName $_.ResourceGroupName `
+					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier100GB"
+				}
+			} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -lt $averageDailyIngestion) {
 				Add-Recommendation `
 				-SubscriptionName $subscriptionName `
 				-ResourceId $_.ResourceId `
 				-ResourceName $_.Name `
 				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier5000GB"
-			}
-			elseif($averageDailyIngestion -gt 2000) {
+				-RecommendationType "LogAnalyticsWorkspaceCommitmentTierIncrease"
+			} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -gt ($averageDailyIngestion + 100)) {
 				Add-Recommendation `
 				-SubscriptionName $subscriptionName `
 				-ResourceId $_.ResourceId `
 				-ResourceName $_.Name `
 				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier2000GB"
-			}			
-			elseif($averageDailyIngestion -gt 1000) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier1000GB"
-			}
-			elseif($averageDailyIngestion -gt 500) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier500GB"
-			}			
-			elseif($averageDailyIngestion -gt 400) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier400GB"
-			}			
-			elseif($averageDailyIngestion -gt 300) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier300GB"
-			}
-			elseif($averageDailyIngestion -gt 200) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier200GB"
-			}
-			elseif($averageDailyIngestion -gt 100) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier100GB"
+				-RecommendationType "LogAnalyticsWorkspaceCommitmentTierDecrease"
 			}
 		}
 	}
@@ -277,8 +292,7 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
 '@
 
-	$logAnalyticsWorkspaceCache | Where-Object { $_.Sku.contains("pergb") } `
-	| ForEach-Object {
+	$logAnalyticsWorkspaceCache	| ForEach-Object {
 		$workspaceName = $_.Name
 		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
 		
@@ -286,70 +300,86 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 			$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
 			if($averageDailyIngestion -ne "NaN") {
-				if($averageDailyIngestion -gt 5000) {
+				if($_.Sku.contains("pergb")) {
+					if($averageDailyIngestion -gt 5000) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier5000GB"
+					}
+					elseif($averageDailyIngestion -gt 2000) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier2000GB"
+					}			
+					elseif($averageDailyIngestion -gt 1000) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier1000GB"
+					}
+					elseif($averageDailyIngestion -gt 500) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier500GB"
+					}			
+					elseif($averageDailyIngestion -gt 400) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier400GB"
+					}			
+					elseif($averageDailyIngestion -gt 300) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier300GB"
+					}
+					elseif($averageDailyIngestion -gt 200) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier200GB"
+					}
+					elseif($averageDailyIngestion -gt 100) {
+						Add-Recommendation `
+						-SubscriptionName $subscriptionName `
+						-ResourceId $_.ResourceId `
+						-ResourceName $_.Name `
+						-ResourceGroupName $_.ResourceGroupName `
+						-RecommendationType "SentinelWorkspaceCommitmentTier100GB"
+					}
+				} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -lt $averageDailyIngestion) {
 					Add-Recommendation `
 					-SubscriptionName $subscriptionName `
 					-ResourceId $_.ResourceId `
 					-ResourceName $_.Name `
 					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier5000GB"
-				}
-				elseif($averageDailyIngestion -gt 2000) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier2000GB"
-				}			
-				elseif($averageDailyIngestion -gt 1000) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier1000GB"
-				}
-				elseif($averageDailyIngestion -gt 500) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier500GB"
-				}			
-				elseif($averageDailyIngestion -gt 400) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier400GB"
-				}			
-				elseif($averageDailyIngestion -gt 300) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier300GB"
-				}
-				elseif($averageDailyIngestion -gt 200) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier200GB"
-				}
-				elseif($averageDailyIngestion -gt 100) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier100GB"
-				}
+					-RecommendationType "SentinelWorkspaceCommitmentTierIncrease"
+				} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -gt ($averageDailyIngestion + 100)) {
+				Add-Recommendation `
+				-SubscriptionName $subscriptionName `
+				-ResourceId $_.ResourceId `
+				-ResourceName $_.Name `
+				-ResourceGroupName $_.ResourceGroupName `
+				-RecommendationType "SentinelWorkspaceCommitmentTierDecrease"
+			}
 			}
 		}
 	}
