@@ -122,19 +122,34 @@ $childOutput | Where-Object { $_.OutputType -eq "Recommendation" } | ForEach-Obj
 	$script:allRecommendations += ConvertTo-Object($_)
 }
 
-Write-Verbose "Generating report CSV..." -Verbose
-$csvContent = (($subscriptionMetadata `
+Write-Verbose "Generating summary CSV..." -Verbose
+$summaryCsv = (($subscriptionMetadata `
 	| Select-Object -Property SubscriptionName, TotalRecommendationCount, CostLastMonthUSD, * -ExcludeProperty OutputType 2>$null `
 	| ConvertTo-CSV -NoTypeInformation) -join [Environment]::NewLine)
 
-$csvContent += [Environment]::NewLine
-$csvContent += [Environment]::NewLine
-
-$csvContent += ($allRecommendations `
+Write-Verbose "Generating report CSV..." -Verbose
+$reportCsv = ($allRecommendations `
 	| Select-Object -Property * -ExcludeProperty EstimatedSavingsRatio, OutputType `
 	| ConvertTo-CSV -NoTypeInformation) -join [Environment]::NewLine
 
+$totalEstimatedMonthlySavings = 0
+$script:allRecommendations | ForEach-Object {
+	if($_.EstimatedMonthlySavings -ne "No estimate") {
+		$totalEstimatedMonthlySavings += $_.EstimatedMonthlySavings
+	}
+}
+
+$totalEstimatedMonthlySavings = [math]::Round($totalEstimatedMonthlySavings,2)
+
+$payload = [pscustomobject]@{
+	ReportCSV = $reportCsv
+	SummaryCSV = $summaryCsv
+	SubscriptionCount = $subscriptions.Count
+	RecommendationCount = $allRecommendations.Count
+	EstimatedMonthlySavings = "$totalEstimatedMonthlySavings USD"
+} | ConvertTo-Json
+
 Write-Verbose "Posting data to Logic App..." -Verbose
-Invoke-RestMethod -Uri $logicAppUri -Method Post -Body $csvContent -ContentType "text/csv"
+Invoke-RestMethod -Uri $logicAppUri -Method Post -Body $payload -ContentType "application/json"
 
 Write-Verbose "Complete" -Verbose
