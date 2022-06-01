@@ -31,7 +31,7 @@ $config.Keys | ForEach-Object {
 }
 
 do {
-    $confirm = Read-Host -Prompt "Please review the above configuration and ensure your account has at least the Contributor roles on the target subscription. Continue deployment? (Y/N)"
+    $confirm = Read-Host -Prompt "Please review the above configuration and ensure your account has at least the Contributor role on the target subscription. Continue deployment? (Y/N)"
 
     if($confirm -eq "Y") {
         Write-Host "Beginning deployment..." -ForegroundColor Green
