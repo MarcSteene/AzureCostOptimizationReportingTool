@@ -71,7 +71,7 @@ function Initialize-RecoveryServicesVaultCache {
 function Initialize-LogAnalyticsWorkspaceCache {
 	Write-Verbose "Building Log Analytics Workspace cache..." -Verbose
 
-	$script:logAnalyticsWorkspaceCache = Get-AzOperationalInsightsWorkspace
+	$script:logAnalyticsWorkspaceCache = Get-AzOperationalInsightsWorkspace | Where-Object { $_.Name -notlike "DefaultWorkspace-*" }
 }
 
 function Add-BillingData {
@@ -134,16 +134,44 @@ function Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations {
         [parameter(Mandatory=$true)]
         [String] $subscriptionName 
     )
-	Write-Verbose "Checking for Log Analytics Workspaces with non-default (>30 days) data retention period..." -Verbose
+	Write-Verbose "Checking for Log Analytics Workspaces with billable data retention period (>30 days)..." -Verbose
 
-	$logAnalyticsWorkspaceCache | Where-Object { $_.retentionInDays -gt 30 } `
+	$logAnalyticsWorkspaceCache `
+	| Where-Object { $_.retentionInDays -gt 31 } `
 	| ForEach-Object {
-		Add-Recommendation `
-		-SubscriptionName $subscriptionName `
-		-ResourceId $_.ResourceId `
-		-ResourceName $_.Name `
-		-ResourceGroupName $_.ResourceGroupName `
-		-RecommendationType "NonDefaultLogAnalyticsRetention"
+		$workspaceName = $_.Name
+		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
+		if(!$sentinelEnabled) {
+			Add-Recommendation `
+			-SubscriptionName $subscriptionName `
+			-ResourceId $_.ResourceId `
+			-ResourceName $_.Name `
+			-ResourceGroupName $_.ResourceGroupName `
+			-RecommendationType "NonDefaultLogAnalyticsRetention"
+		}
+	}
+}
+
+function Add-NonDefaultSentinelWorkspaceRetentionPeriodRecommendations {
+	Param(
+        [parameter(Mandatory=$true)]
+        [String] $subscriptionName 
+    )
+	Write-Verbose "Checking for Sentinel Workspaces with billable data retention period (>90 days)..." -Verbose
+
+	$logAnalyticsWorkspaceCache | Where-Object { $_.retentionInDays -gt 90 } `
+	| ForEach-Object {
+		$workspaceName = $_.Name
+		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
+
+		if($sentinelEnabled) {
+			Add-Recommendation `
+			-SubscriptionName $subscriptionName `
+			-ResourceId $_.ResourceId `
+			-ResourceName $_.Name `
+			-ResourceGroupName $_.ResourceGroupName `
+			-RecommendationType "NonDefaultSentinelWorkspaceRetention"
+		}
 	}
 }
 
@@ -162,7 +190,7 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
 		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
 '@
 
-	$logAnalyticsWorkspaceCache | Where-Object { $_.Name -notlike "DefaultWorkspace-*" -and $_.Sku.contains("pergb") } `
+	$logAnalyticsWorkspaceCache | Where-Object { $_.Sku.contains("pergb") } `
 	| ForEach-Object {
 		$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
@@ -173,6 +201,41 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
 			-ResourceName $_.Name `
 			-ResourceGroupName $_.ResourceGroupName `
 			-RecommendationType "LogAnalyticsWorkspaceCommitmentTier"
+		}
+	}
+}
+
+function Add-SentinelWorkspaceCommitmentTierRecommendations {
+	    Param(
+        [parameter(Mandatory=$true)]
+        [String] $subscriptionName 
+    )
+	Write-Verbose "Checking for Sentinel Workspaces on Pay-as-you-go SKU with 100GB+ average daily ingestion..." -Verbose
+
+	$query = @'
+		Usage
+		| where TimeGenerated > ago(31d) and TimeGenerated < ago(1d)
+		| where IsBillable == True
+		| summarize TotalGBytes =round(sum(Quantity/(1024)),2) by bin(TimeGenerated, 1d)
+		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
+'@
+
+	$logAnalyticsWorkspaceCache | Where-Object { $_.Sku.contains("pergb") } `
+	| ForEach-Object {
+		$workspaceName = $_.Name
+		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
+
+		if($sentinelEnabled) {
+			$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
+
+			if($averageDailyIngestion -ne "NaN" -and $averageDailyIngestion -gt 100) {
+				Add-Recommendation `
+				-SubscriptionName $subscriptionName `
+				-ResourceId $_.ResourceId `
+				-ResourceName $_.Name `
+				-ResourceGroupName $_.ResourceGroupName `
+				-RecommendationType "SentinelWorkspaceCommitmentTier"
+			}
 		}
 	}
 }

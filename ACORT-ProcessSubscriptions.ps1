@@ -110,6 +110,8 @@ $subscriptions | ForEach-Object {
 	Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
 	Add-LogAnalyticsWorkspaceCommitmentTierRecommendations -SubscriptionName $_.Name
 	Add-LogAnalyticsWorkspacePerNodeTierRecommendations -SubscriptionName $_.Name
+	Add-NonDefaultSentinelWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
+	Add-SentinelWorkspaceCommitmentTierRecommendations -SubscriptionName $_.Name
 
 	if($_.SubscriptionPolicies.QuotaId.Contains("DevTest")) {
 		Add-DevVMNoAutoshutdownScheduleRecommendations -SubscriptionName $_.Name

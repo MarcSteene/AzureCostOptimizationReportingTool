@@ -145,14 +145,24 @@ $recommendationTable = @{
 		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/offers/ms-azr-0148p/"
 	}
 	"NonDefaultLogAnalyticsRetention" = @{
-		RecommendationDescription = "Review Log Analytics Workspace with a non-default (> 30 days) data retention period and consider whether this is required"
+		RecommendationDescription = "Review Log Analytics Workspace with a data retention period configured above the free threshold (30 days) and consider whether this is required"
 		EstimatedSavingsRatio = $null
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs"
+	}
+	"NonDefaultSentinelWorkspaceRetention" = @{
+		RecommendationDescription = "Review Sentinel workspace with a data retention period configured above the free threshold (90 days) and consider whether this is required"
+		EstimatedSavingsRatio = $null
+		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/sentinel/billing?tabs=commitment-tier#analytics-logs"
 	}
 	"LogAnalyticsWorkspaceCommitmentTier" = @{
 		RecommendationDescription = "Consider changing Log Analytics Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a Commitment SKU for discounts"
 		EstimatedSavingsRatio = 0.85
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs#commitment-tiers"
+	}
+	"SentinelWorkspaceCommitmentTier" = @{
+		RecommendationDescription = "Consider changing Sentinel Workspace with average daily data ingestion 100GB+ from Pay-as-you-go SKU to a Commitment SKU for discounts"
+		EstimatedSavingsRatio = 0.5
+		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/pricing/details/microsoft-sentinel/"
 	}
 	"LogAnalyticsPerNodePricingTier" = @{
 		RecommendationDescription = "Use the Microsoft-provided query to determine whether it would be cheaper to remain on the Per-Node pricing tier or change to Pay-as-you-go"
