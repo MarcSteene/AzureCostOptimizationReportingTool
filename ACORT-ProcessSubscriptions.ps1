@@ -41,7 +41,8 @@ $billingQuery = @"
 				"Microsoft.Sql/servers/databases",
 				"Microsoft.Compute/snapshots",
 				"Microsoft.Compute/virtualMachineScaleSets",
-				"Microsoft.OperationalInsights/workspaces"
+				"Microsoft.OperationalInsights/workspaces",
+				"Microsoft.SecurityInsights"
 			]
 		}
 	},
@@ -88,6 +89,7 @@ $subscriptions | ForEach-Object {
 	Initialize-DiskCache
 	Initialize-StorageAccountCache
 	Initialize-RecoveryServicesVaultCache
+	Initialize-LogAnalyticsWorkspaceCache
 
 	Add-AdvisorRecommendations -SubscriptionName $_.Name
 	Add-UnattachedPublicIpRecommendations -SubscriptionName $_.Name

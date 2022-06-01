@@ -163,7 +163,6 @@ function Add-NonDefaultSentinelWorkspaceRetentionPeriodRecommendations {
 	| ForEach-Object {
 		$workspaceName = $_.Name
 		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
-
 		if($sentinelEnabled) {
 			Add-Recommendation `
 			-SubscriptionName $subscriptionName `
@@ -224,7 +223,7 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 	| ForEach-Object {
 		$workspaceName = $_.Name
 		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
-
+		
 		if($sentinelEnabled) {
 			$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
