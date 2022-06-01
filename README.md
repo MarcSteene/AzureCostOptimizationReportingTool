@@ -7,26 +7,55 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Leverage cost data to understand optimization potential and determine remediation priority.
 * Incorporates all Azure Advisor recommendations.
 
-## Prerequisites
+## Table of Contents
+
+* [Prerequisites](#prerequisites)
+* [Assessment Scope](#assessmentscope)
+* [Deployment Guide](#deployment)
+* [Troubleshooting](#troubleshooting)
+* [Disclaimer](#disclaimer)
+
+## <a id="prerequisites"></a> Prerequisites
 * A user with the `Contributor` role on a subscription to deploy the resources.
 * A user with a mailbox to send the email report.
 * A user with `User Access Administrator` or `Owner` on the subscriptions or management groups to be included in the assessment.
 
-## Assessment Scope
-* No use of Dev/Test subscription offer
+## <a id="assessmentscope"></a> Assessment Scope
+
+### Azure Advisor Recommendations
+* Imports all Azure Advisor recommendations (reserved instances, VM SKU size etc.)
+
+### Orphaned Resources
 * Unattached Public IP adresses
 * Uattached Managed Disks
-* VMs in 'Stopped' power state
-* VMs in Dev/Test subscriptions without an autoshutdown schedule
+* VMs deallocated for more than 90 days
+* Snapshots older than 1 year
+* Empty Availability Sets
+* Unattached Network Interfaces
+* Unattached Network Security Groups
+* Empty Load Balancers
+
+### Sentinel
+* Sentinel Workspaces with a retention period configured beyond free period (> 90 days)
+* Sentinel Workspaces not using an optimal commitment tier based on average daily data ingestion
+
+### Log Analytics
+* Log Analytics Workspaces with a retention period configured beyond free period (> 31 days)
+* Log Analytics Workspaces not using an optimal commitment tier based on average daily data ingestion
+* Log Analytics workspaces using legacy Per-Node pricing tier
+
+### Hybrid Benefit
 * Windows VMs without Hybrid Benefit
 * Windows VM Scale Sets without Hybrid Benefit
 * SQL Databases not using Hybrid Benefit
 * SQL Managed Instances not using Hybrid Benefit
 * Red Hat Enterprise Linux VMs not using Hybrid Benefit
 * SUSE Linux Enterprise Server VMs not using Hybrid Benefit
-* VMs deallocated for more than 90 days
+
+### Non-Production Subscription Optimizations
+* No use of Dev/Test subscription offer
+* VMs in Dev/Test subscriptions without an autoshutdown schedule
 * Recovery Services Vaults in Dev/Test subscriptions using Geo-Redundant Storage (GRS)
-* Snapshots older than 1 year
 * Premium SKU Managed Disks in Dev/Test subscriptions
 * Premium SKU Storage Accounts in Dev/Test subscriptions
 * Storage Accounts using Zone-Redundant Storage in Dev/Test Subscriptions
@@ -34,19 +63,15 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Storage Accounts using Geo-Zone-Redundant Storage in Dev/Test Subscriptions
 * Storage Accounts using Read-Access Geo-Redundant Storage in Dev/Test Subscriptions
 * Storage Accounts using Read-Access Geo-Zone-Redundant Storage in Dev/Test Subscriptions
+
+### Virtual Machines
+* VMs in 'Stopped' power state
+
+### Storage Accounts
 * Legacy v1 Storage Accounts
 * Storage Accounts without data lifecycle management rules
-* Log Analytics Workspaces with a retention period configured beyond free period (> 31 days)
-* Sentinel Workspaces with a retention period configured beyond free period (> 90 days)
-* Log Analytics Workspaces using Pay-as-you-go pricing with > 100GB daily average data ingestion
-* Sentinel Workspaces using Pay-as-you-go pricing with > 100GB daily average data ingestion
-* Log Analytics workspaces using legacy Per-Node pricing tier
-* Empty Availability Sets
-* Unattached Network Interfaces
-* Unattached Network Security Groups
-* Empty Load Balancers
 
-## Deployment
+## <a id="deployment"></a> Deployment Guide
 <b>[Video deployment guide (YouTube)](https://www.youtube.com/watch?v=_YY9VsRaJ0Q)</b>
 
 1. Open the Azure Portal and open a Cloud Shell (PowerShell). If this is your first time using Cloud Shell, it may require set up.
@@ -83,7 +108,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
 
-## Troubleshooting
+## <a id="troubleshooting"></a> Troubleshooting
 1. Navigate to the deployed Automation Account.
 2. Select `Jobs` from the list.
 3. Select the `ACORT-Main` job from the list.
@@ -91,5 +116,5 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 5. If all looks well in the main job output, return to the Jobs list.
 6. Review all `ACORT-ProcessSubscriptions` job logs (there may be multiple worker jobs if you have multiple subscriptions) and resolve any errors.
 
-## Disclaimer
+## <a id="disclaimer"></a> Disclaimer
 The Azure Cost Optimization Reporting Tool is not supported under any Microsoft standard support program or service. It is provided AS IS without warranty of any kind. The entire risk arising out of the use or performance of the script and documentation remains with you.
