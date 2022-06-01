@@ -986,6 +986,17 @@ function Add-AdvisorRecommendations {
 	}
 }
 
+function Add-WACOAIPRecommendation {
+	Write-Verbose "Adding Microsoft IP recommendation..." -Verbose
+
+	Add-Recommendation `
+	-SubscriptionName "Global" `
+	-ResourceId "NA" `
+	-ResourceName "NA" `
+	-ResourceGroupName "NA" `
+	-RecommendationType "WACOAIP"
+}
+
 function Add-WAFRecommendation {
 	Write-Verbose "Adding Well-Architected Framework recommendation..." -Verbose
 

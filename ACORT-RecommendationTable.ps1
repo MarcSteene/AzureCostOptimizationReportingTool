@@ -139,6 +139,11 @@ $recommendationTable = @{
 		EstimatedSavingsRatio = $null
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/get-started/manage-costs"
 	}
+	"WACOAIP" = @{
+		RecommendationDescription = "Consider the Microsoft Well-Architected Cost Optimization Assessment and Implementation IP to work with an accredited Microsoft engineer to optimize your Azure resources"
+		EstimatedSavingsRatio = $null
+		MicrosoftGuidance = "Contact your Customer Success Account Manager (CSAM) for details"
+	}
 	"DevTestOffer" = @{
 		RecommendationDescription = "No subscriptions using the Dev/Test subscription offer found. Use the Dev/Test offer for your non-production subscriptions for significant discounts"
 		EstimatedSavingsRatio = $null

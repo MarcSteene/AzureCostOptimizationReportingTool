@@ -37,6 +37,7 @@ $subscriptions | ForEach-Object {
 	Write-Verbose "$($_.Name) - $($_.Id)" -Verbose
 }
 
+Add-WACOAIPRecommendation
 Add-WAFRecommendation
 Add-CAFRecommendation
 Add-DevTestRecommendation -Subscriptions $subscriptions
