@@ -8,17 +8,11 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Incorporates all Azure Advisor recommendations.
 
 ## Table of Contents
-
-* [Prerequisites](#prerequisites)
 * [Assessment Scope](#assessmentscope)
+* [Prerequisites](#prerequisites)
 * [Deployment Guide](#deployment)
 * [Troubleshooting](#troubleshooting)
 * [Disclaimer](#disclaimer)
-
-## <a id="prerequisites"></a> Prerequisites
-* A user with the `Contributor` role on a subscription to deploy the resources.
-* A user with a mailbox to send the email report.
-* A user with `User Access Administrator` or `Owner` on the subscriptions or management groups to be included in the assessment.
 
 ## <a id="assessmentscope"></a> Assessment Scope
 
@@ -70,6 +64,11 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 ### Storage Accounts
 * Legacy v1 Storage Accounts
 * Storage Accounts without data lifecycle management rules
+
+## <a id="prerequisites"></a> Prerequisites
+* A user with the `Contributor` role on a subscription to deploy the resources.
+* A user with a mailbox to send the email report.
+* A user with `User Access Administrator` or `Owner` on the subscriptions or management groups to be included in the assessment.
 
 ## <a id="deployment"></a> Deployment Guide
 <b>[Video deployment guide (YouTube)](https://www.youtube.com/watch?v=_YY9VsRaJ0Q)</b>
