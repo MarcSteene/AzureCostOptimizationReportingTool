@@ -111,7 +111,7 @@ New-AzAutomationAccount -Name $configAutomationAccountName `
 
 Write-Host "Registering modules on automation account..." -ForegroundColor Yellow
 $module = Find-Module az.MonitoringSolutions
-New-AzAutomationModule -AutomationAccountName $configAutomationAccountName -ResourceGroupName $configResourceGroupName -Name $module.Name -ContentLinkUri "$($module.RepositorySourceLocation)package/$($module.Name)/$($module.Version)"                        
+New-AzAutomationModule -AutomationAccountName $configAutomationAccountName -ResourceGroupName $configResourceGroupName -Name $module.Name -ContentLinkUri "$($module.RepositorySourceLocation)/package/$($module.Name)/$($module.Version)"                        
 
 Write-Host "Enabling Managed Identity on Automation Account..." -ForegroundColor Yellow
 Set-AzAutomationAccount -Name $configAutomationAccountName `
