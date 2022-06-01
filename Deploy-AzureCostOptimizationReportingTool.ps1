@@ -65,7 +65,7 @@ if(!$deploymentSubscription) {
     exit
 }
 
-Write-Host "[2/18] Subscription identified. Setting context." -ForegroundColor Green
+Write-Host "[2/18] Subscription identified. Setting context." -ForegroundColor Yellow
 Set-AzContext -SubscriptionName $deploymentSubscription.Name
 
 Write-Host "[3/18] Creating resource group..." -ForegroundColor Yellow
