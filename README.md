@@ -11,6 +11,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * [Assessment Scope](#assessmentscope)
 * [Prerequisites](#prerequisites)
 * [Deployment Guide](#deployment)
+* [Example Reports](#examplereports)
 * [Troubleshooting](#troubleshooting)
 * [Disclaimer](#disclaimer)
 
@@ -106,6 +107,13 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 <br>![](./docs/startRunbook.jpg)</br>
 16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
+
+## <a id="examplereports"></a> Example Reports
+<b>Summary Report</b>
+<br>![](./docs/ExampleReport-Summary.jpg)</br>
+<br></br>
+<b>Recommendation Report </b>
+<br>![](./docs/ExampleReport-Results.jpg)</br>
 
 ## <a id="troubleshooting"></a> Troubleshooting
 1. Navigate to the deployed Automation Account.
