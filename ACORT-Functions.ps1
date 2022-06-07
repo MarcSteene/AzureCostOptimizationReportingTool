@@ -179,7 +179,7 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
         [parameter(Mandatory=$true)]
         [String] $subscriptionName 
     )
-	Write-Verbose "Checking for Log Analytics Workspaces on Pay-as-you-go SKU with 100GB+ average daily ingestion..." -Verbose
+	Write-Verbose "Checking Log Analytics Workspaces for commitment tier right-size..." -Verbose
 
 	$query = @'
 		Usage
@@ -258,7 +258,7 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
 					-ResourceGroupName $_.ResourceGroupName `
 					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier100GB"
 				}
-			} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -lt $averageDailyIngestion) {
+			} elseif($_.CapacityReservationLevel -gt 0 -and ($_.CapacityReservationLevel + 100) -lt $averageDailyIngestion) {
 				Add-Recommendation `
 				-SubscriptionName $subscriptionName `
 				-ResourceId $_.ResourceId `
@@ -282,7 +282,7 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
         [parameter(Mandatory=$true)]
         [String] $subscriptionName 
     )
-	Write-Verbose "Checking for Sentinel Workspaces on Pay-as-you-go SKU with 100GB+ average daily ingestion..." -Verbose
+	Write-Verbose "Checking Sentinel Workspaces for commitment tier right-size......" -Verbose
 
 	$query = @'
 		Usage
@@ -365,7 +365,7 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 						-ResourceGroupName $_.ResourceGroupName `
 						-RecommendationType "SentinelWorkspaceCommitmentTier100GB"
 					}
-				} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -lt $averageDailyIngestion) {
+				} elseif($_.CapacityReservationLevel -gt 0 -and ($_.CapacityReservationLevel + 100) -lt $averageDailyIngestion) {
 					Add-Recommendation `
 					-SubscriptionName $subscriptionName `
 					-ResourceId $_.ResourceId `
