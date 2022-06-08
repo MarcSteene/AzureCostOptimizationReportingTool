@@ -17,8 +17,8 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ## <a id="assessmentscope"></a> Assessment Scope
 
-### Azure Advisor Recommendations
-* Imports all Azure Advisor recommendations (reserved instances, VM SKU size etc.)
+### Azure Advisor
+* Imports all Azure Advisor cost recommendations (reserved instances, VM SKU size etc.)
 
 ### Orphaned Resources
 * Unattached Public IP adresses
