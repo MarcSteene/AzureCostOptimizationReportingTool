@@ -26,8 +26,18 @@ function Add-Recommendation {
 		[parameter(Mandatory=$true)][String]
 		$resourceGroupName,
 		[parameter(Mandatory=$true)][string]
-		$recommendationType
+		$recommendationType,
+		$savingsRatio
 	)
+
+	$estimatedSavingsRatio = $null
+
+	if($savingsRatio) {
+		$estimatedSavingsRatio = $savingsRatio
+	}
+	else {
+		$estimatedSavingsRatio = $recommendationTable[$recommendationType].EstimatedSavingsRatio
+	}
 
 	$script:allRecommendations += [pscustomobject]@{
 		OutputType = "Recommendation"
@@ -37,7 +47,7 @@ function Add-Recommendation {
 		ResourceName = $resourceName
 		ResourceGroup = $resourceGroupName
 		CostLastMonth = "No billing data"
-		EstimatedSavingsRatio = $recommendationTable[$recommendationType].EstimatedSavingsRatio
+		EstimatedSavingsRatio = $estimatedSavingsRatio
 		EstimatedMonthlySavings = "No estimate"
 		Currency = $null
 		MicrosoftGuidance = $recommendationTable[$recommendationType].MicrosoftGuidance
@@ -182,99 +192,83 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
 	Write-Verbose "Checking Log Analytics Workspaces for commitment tier right-size..." -Verbose
 
 	$query = @'
-		Usage
-		| where TimeGenerated > ago(31d) and TimeGenerated < ago(1d)
-		| where IsBillable == True
-		| summarize TotalGBytes =round(sum(Quantity/(1024)),2) by bin(TimeGenerated, 1d)
-		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
+	Usage
+	| where TimeGenerated > ago(31d) and TimeGenerated < ago(1d)
+	| where IsBillable == True
+	| summarize TotalGBytes =round(sum(Quantity/(1024)),2) by bin(TimeGenerated, 1d)
+	| summarize ['gbperday'] =round(avg(TotalGBytes),2)
 '@
 
-	$logAnalyticsWorkspaceCache | ForEach-Object {
+	$uri = "https://prices.azure.com/api/retail/prices?`$filter=productName eq 'Azure Monitor'"
+	$monitorPricing = @()
+
+	do {
+		$response = Invoke-RestMethod -Uri $uri
+		$monitorPricing += $response.Items
+		$uri = $response.NextPageLink
+	}
+	while ($response.NextPageLink)
+
+	$uri = "https://prices.azure.com/api/retail/prices?`$filter=productName eq 'Log Analytics'"
+	$logAnalyticsPricing = @()
+
+	do {
+		$response = Invoke-RestMethod -Uri $uri
+		$logAnalyticsPricing += $response.Items
+		$uri = $response.NextPageLink
+	}
+	while ($response.NextPageLink)
+
+	$logAnalyticsWorkspaceCache	| ForEach-Object {		
 		$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
 		if($averageDailyIngestion -ne "NaN") {
-			if($_.Sku.contains("pergb")) {
-				if($averageDailyIngestion -gt 5000) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier5000GB"
+			$location = $_.Location
+			$localPrices = $monitorPricing | Where-Object { $_.armRegionName -eq $location }
+    		$localPrices += $logAnalyticsPricing | Where-Object { $_.armRegionName -eq $armLocation }
+
+			$priceHash = @{}
+
+			$localPrices | ForEach-Object {
+				if($_.skuName -eq "Pay-as-you-go" -and $_.retailPrice -gt 0) {
+					$priceHash["PAYG"] = $_.retailPrice * $averageDailyIngestion
 				}
-				elseif($averageDailyIngestion -gt 2000) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier2000GB"
-				}			
-				elseif($averageDailyIngestion -gt 1000) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier1000GB"
+				elseif($_.skuName.Contains("Commitment")) {
+					$capacity = [int]($_.skuName -split " GB")[0]
+					$perGbPrice = $_.retailPrice / $capacity
+					$priceHash[$capacity] = $_.retailPrice + ([math]::max(0, ($averageDailyIngestion - $capacity)) * $perGbPrice) 
 				}
-				elseif($averageDailyIngestion -gt 500) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier500GB"
-				}			
-				elseif($averageDailyIngestion -gt 400) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier400GB"
-				}			
-				elseif($averageDailyIngestion -gt 300) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier300GB"
+			}
+
+			$lowestCost = ($priceHash.Values | Measure-Object -Minimum).Minimum
+	
+			$priceHash.Keys | ForEach-Object {
+				if($priceHash[$_] -eq $lowestCost) {
+					$optimalTier = $_
 				}
-				elseif($averageDailyIngestion -gt 200) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier200GB"
+			}
+
+			if(($_.sku.Contains("pergb") -and $optimalTier -ne "PAYG") -or ($_.sku -eq "capacityreservation" -and $optimalTier -eq "PAYG") -or ($_.Sku -eq "capacityreservation" -and $_.CapacityReservationLevel -ne $optimalTier)) {
+				if($_.Sku.Contains("pergb")) {
+					$currentCost = $priceHash["PAYG"]
+				} elseif($_.Sku -eq "capacityreservation") {
+					$currentCost = $priceHash[$_.CapacityReservationLevel]
 				}
-				elseif($averageDailyIngestion -gt 100) {
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "LogAnalyticsWorkspaceCommitmentTier100GB"
-				}
-			} elseif($_.CapacityReservationLevel -gt 0 -and ($_.CapacityReservationLevel + 100) -lt $averageDailyIngestion) {
+				
+				$savingsRatio = ($currentCost - $priceHash[$optimalTier]) / $currentCost
+				
 				Add-Recommendation `
 				-SubscriptionName $subscriptionName `
 				-ResourceId $_.ResourceId `
 				-ResourceName $_.Name `
 				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTierIncrease"
-			} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -gt ($averageDailyIngestion + 100)) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "LogAnalyticsWorkspaceCommitmentTierDecrease"
+				-RecommendationType "LogAnalyticsWorkspaceCommitmentTier$optimalTier" `
+				-SavingsRatio $savingsRatio
 			}
 		}
 	}
+
+
 }
 
 function Add-SentinelWorkspaceCommitmentTierRecommendations {
@@ -292,6 +286,16 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
 '@
 
+	$uri = "https://prices.azure.com/api/retail/prices?`$filter=serviceName eq 'Sentinel'"
+	$sentinelPricing = @()
+
+	do {
+		$response = Invoke-RestMethod -Uri $uri
+		$sentinelPricing += $response.Items
+		$uri = $response.NextPageLink
+	}
+	while ($response.NextPageLink)
+
 	$logAnalyticsWorkspaceCache	| ForEach-Object {
 		$workspaceName = $_.Name
 		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
@@ -300,86 +304,47 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 			$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
 			if($averageDailyIngestion -ne "NaN") {
-				if($_.Sku.contains("pergb")) {
-					if($averageDailyIngestion -gt 5000) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier5000GB"
+				$location = $_.Location
+				$localPrices = $sentinelPricing | Where-Object { $_.armRegionName -eq $location }
+
+				$priceHash = @{}
+
+				$localPrices | ForEach-Object {
+					if($_.skuName -eq "Pay-as-you-go") {
+						$priceHash["PAYG"] = $_.retailPrice * $averageDailyIngestion
 					}
-					elseif($averageDailyIngestion -gt 2000) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier2000GB"
-					}			
-					elseif($averageDailyIngestion -gt 1000) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier1000GB"
+					elseif($_.skuName.Contains("Commitment")) {
+						$capacity = [int]($_.skuName -split " GB")[0]
+						$perGbPrice = $_.retailPrice / $capacity
+						$priceHash[$capacity] = $_.retailPrice + ([math]::max(0, ($averageDailyIngestion - $capacity)) * $perGbPrice) 
 					}
-					elseif($averageDailyIngestion -gt 500) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier500GB"
-					}			
-					elseif($averageDailyIngestion -gt 400) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier400GB"
-					}			
-					elseif($averageDailyIngestion -gt 300) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier300GB"
+				}
+
+				$lowestCost = ($priceHash.Values | Measure-Object -Minimum).Minimum
+		
+				$priceHash.Keys | ForEach-Object {
+					if($priceHash[$_] -eq $lowestCost) {
+						$optimalTier = $_
 					}
-					elseif($averageDailyIngestion -gt 200) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier200GB"
+				}
+
+				if(($_.sku.Contains("pergb") -and $optimalTier -ne "PAYG") -or ($_.sku -eq "capacityreservation" -and $optimalTier -eq "PAYG") -or ($_.Sku -eq "capacityreservation" -and $_.CapacityReservationLevel -ne $optimalTier)) {
+					if($_.Sku.Contains("pergb")) {
+						$currentCost = $priceHash["PAYG"]
+					} elseif($_.Sku -eq "capacityreservation") {
+						$currentCost = $priceHash[$_.CapacityReservationLevel]
 					}
-					elseif($averageDailyIngestion -gt 100) {
-						Add-Recommendation `
-						-SubscriptionName $subscriptionName `
-						-ResourceId $_.ResourceId `
-						-ResourceName $_.Name `
-						-ResourceGroupName $_.ResourceGroupName `
-						-RecommendationType "SentinelWorkspaceCommitmentTier100GB"
-					}
-				} elseif($_.CapacityReservationLevel -gt 0 -and ($_.CapacityReservationLevel + 100) -lt $averageDailyIngestion) {
+					
+					$savingsRatio = ($currentCost - $priceHash[$optimalTier]) / $currentCost
+					
 					Add-Recommendation `
 					-SubscriptionName $subscriptionName `
 					-ResourceId $_.ResourceId `
 					-ResourceName $_.Name `
 					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTierIncrease"
-				} elseif($_.CapacityReservationLevel -gt 0 -and $_.CapacityReservationLevel -gt ($averageDailyIngestion + 100)) {
-				Add-Recommendation `
-				-SubscriptionName $subscriptionName `
-				-ResourceId $_.ResourceId `
-				-ResourceName $_.Name `
-				-ResourceGroupName $_.ResourceGroupName `
-				-RecommendationType "SentinelWorkspaceCommitmentTierDecrease"
-			}
+					-RecommendationType "SentinelWorkspaceCommitmentTier$optimalTier" `
+					-SavingsRatio $savingsRatio
+				}
 			}
 		}
 	}
