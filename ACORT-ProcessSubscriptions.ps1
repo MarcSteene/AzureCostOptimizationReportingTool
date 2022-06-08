@@ -42,7 +42,7 @@ $billingQuery = @"
 				"Microsoft.Compute/snapshots",
 				"Microsoft.Compute/virtualMachineScaleSets",
 				"Microsoft.OperationalInsights/workspaces",
-				"Microsoft.SecurityInsights"
+				"Microsoft.OperationsManagement/solutions"
 			]
 		}
 	},
