@@ -157,7 +157,7 @@ $recommendationTable = @{
 		MicrosoftGuidance = "https://azure.microsoft.com/en-gb/offers/ms-azr-0148p/"
 	}
 	"NonDefaultLogAnalyticsRetention" = @{
-		RecommendationDescription = "Review Log Analytics Workspace with a data retention period configured above the free threshold (30 days) and consider whether this is required"
+		RecommendationDescription = "Review Log Analytics Workspace with a data retention period configured above the free threshold (31 days) and consider whether this is required"
 		EstimatedSavingsRatio = $null
 		MicrosoftGuidance = "https://docs.microsoft.com/en-us/azure/azure-monitor/logs/cost-logs"
 	}
