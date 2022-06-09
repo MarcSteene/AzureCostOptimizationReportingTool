@@ -78,7 +78,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 1. Open the Azure Portal and open a Cloud Shell (PowerShell). If this is your first time using Cloud Shell, it may require set up.
 <br>![](./docs/cloudShell.jpg)</br>
 2. Run `git clone https://github.com/MarcSteene/AzureCostOptimizationReportingTool.git azurecostoptimizationreportingtool`
-<br>![](.docs/gitClone.jpg)</br>
+<br>![](./docs/gitClone.jpg)</br>
 3. Run `cd ./azurecostoptimizationreportingtool/`
 4. Run `code config.txt`
 5. Update the configuration as required:
