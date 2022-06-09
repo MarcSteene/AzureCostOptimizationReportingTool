@@ -1,3 +1,10 @@
+<#
+	Azure Cost Optimization Reporting Tool
+	Version: v1.0
+	Module: ACORT-ProcessSubscriptions.ps1
+	Author: Marc Steene
+#>
+
 param (
 	[Parameter(Mandatory=$true)] $subscriptions
 )
@@ -109,11 +116,11 @@ $subscriptions | ForEach-Object {
 	Add-NoneAHBRHELVMRecommendations -SubscriptionName $_.Name
 	Add-NoneAHBSLESVMRecommendations -SubscriptionName $_.Name
 	Add-StaleSnapshotRecommendations -SubscriptionName $_.Name
-	Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
+	Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name -SubscriptionId $_.Id
 	Add-LogAnalyticsWorkspaceCommitmentTierRecommendations -SubscriptionName $_.Name
 	Add-LogAnalyticsWorkspacePerNodeTierRecommendations -SubscriptionName $_.Name
-	Add-NonDefaultSentinelWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name
-	Add-SentinelWorkspaceCommitmentTierRecommendations -SubscriptionName $_.Name
+	Add-NonDefaultSentinelWorkspaceRetentionPeriodRecommendations -SubscriptionName $_.Name -SubscriptionId $_.Id
+	Add-SentinelWorkspaceCommitmentTierRecommendations -SubscriptionName $_.Name -SubscriptionId $_.Id
 
 	if($_.SubscriptionPolicies.QuotaId.Contains("DevTest")) {
 		Add-DevVMNoAutoshutdownScheduleRecommendations -SubscriptionName $_.Name

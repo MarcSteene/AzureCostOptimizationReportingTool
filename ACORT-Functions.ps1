@@ -1,3 +1,10 @@
+<#
+	Azure Cost Optimization Reporting Tool
+	Version: v1.0
+	Module: ACORT-Functions.ps1
+	Author: Marc Steene
+#>
+
 $VerbosePreference = "SilentlyContinue"
 
 # Functions
@@ -142,16 +149,18 @@ function Add-UnattachedPublicIpRecommendations {
 function Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations {
 	Param(
         [parameter(Mandatory=$true)]
-        [String] $subscriptionName 
+        [String] $subscriptionName,
+		[parameter(Mandatory=$true)]
+        [String] $subscriptionId
     )
-	Write-Verbose "Checking for Log Analytics Workspaces with billable data retention period (>30 days)..." -Verbose
+	Write-Verbose "Checking for Log Analytics Workspaces with billable data retention period (>31 days)..." -Verbose
 
 	$logAnalyticsWorkspaceCache `
 	| Where-Object { $_.retentionInDays -gt 31 } `
 	| ForEach-Object {
 		$workspaceName = $_.Name
-		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
-		if(!$sentinelEnabled) {
+		$sentinelSolution = Search-AzGraph -Query "resources | where type =~ 'microsoft.operationsmanagement/solutions' | where subscriptionId =~ '$subscriptionId' | where name =~ 'SecurityInsights($workspaceName)'"
+		if($sentinelSolution.Count -eq 0) {
 			Add-Recommendation `
 			-SubscriptionName $subscriptionName `
 			-ResourceId $_.ResourceId `
@@ -165,15 +174,17 @@ function Add-NonDefaultLogAnalyticsWorkspaceRetentionPeriodRecommendations {
 function Add-NonDefaultSentinelWorkspaceRetentionPeriodRecommendations {
 	Param(
         [parameter(Mandatory=$true)]
-        [String] $subscriptionName 
+        [String] $subscriptionName,
+		[parameter(Mandatory=$true)]
+        [String] $subscriptionId
     )
 	Write-Verbose "Checking for Sentinel Workspaces with billable data retention period (>90 days)..." -Verbose
 
 	$logAnalyticsWorkspaceCache | Where-Object { $_.retentionInDays -gt 90 } `
 	| ForEach-Object {
 		$workspaceName = $_.Name
-		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
-		if($sentinelEnabled) {
+		$sentinelSolution = Search-AzGraph -Query "resources | where type =~ 'microsoft.operationsmanagement/solutions' | where subscriptionId =~ '$subscriptionId' | where name =~ 'SecurityInsights($workspaceName)'"
+		if($sentinelSolution.Count -gt 0) {
 			Add-Recommendation `
 			-SubscriptionName $subscriptionName `
 			-ResourceId $_.ResourceId `
@@ -274,7 +285,9 @@ function Add-LogAnalyticsWorkspaceCommitmentTierRecommendations {
 function Add-SentinelWorkspaceCommitmentTierRecommendations {
 	    Param(
         [parameter(Mandatory=$true)]
-        [String] $subscriptionName 
+        [String] $subscriptionName,
+		[parameter(Mandatory=$true)]
+        [String] $subscriptionId
     )
 	Write-Verbose "Checking Sentinel Workspaces for commitment tier right-size......" -Verbose
 
@@ -298,9 +311,9 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 
 	$logAnalyticsWorkspaceCache	| ForEach-Object {
 		$workspaceName = $_.Name
-		$sentinelEnabled = Get-AzMonitorLogAnalyticsSolution | Where-Object { $_.Name -eq "SecurityInsights($workspaceName)"  }
+		$sentinelSolution = Search-AzGraph -Query "resources | where type =~ 'microsoft.operationsmanagement/solutions' | where subscriptionId =~ '$subscriptionId' | where name =~ 'SecurityInsights($workspaceName)'"
 		
-		if($sentinelEnabled) {
+		if($sentinelSolution.Count -gt 0) {
 			$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
 
 			if($averageDailyIngestion -ne "NaN") {
@@ -328,11 +341,11 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 					}
 				}
 
-				if(($_.sku.Contains("pergb") -and $optimalTier -ne "PAYG") -or ($_.sku -eq "capacityreservation" -and $optimalTier -eq "PAYG") -or ($_.Sku -eq "capacityreservation" -and $_.CapacityReservationLevel -ne $optimalTier)) {
-					if($_.Sku.Contains("pergb")) {
+				if(($sentinelSolution.properties.Sku.Name -eq "PerGB" -and $optimalTier -ne "PAYG") -or ($sentinelSolution.properties.Sku.Name -eq "CapacityReservation" -and $optimalTier -eq "PAYG") -or ($sentinelSolution.properties.Sku.Name -eq "CapacityReservation" -and $sentinelSolution.properties.Sku.CapacityReservationLevel -ne $optimalTier)) {
+					if($sentinelSolution.properties.Sku.Name -eq "PerGB") {
 						$currentCost = $priceHash["PAYG"]
-					} elseif($_.Sku -eq "capacityreservation") {
-						$currentCost = $priceHash[$_.CapacityReservationLevel]
+					} elseif($sentinelSolution.properties.Sku.Name -eq "CapacityReservation") {
+						$currentCost = $priceHash[$sentinelSolution.properties.Sku.CapacityReservationLevel]
 					}
 					
 					$savingsRatio = ($currentCost - $priceHash[$optimalTier]) / $currentCost

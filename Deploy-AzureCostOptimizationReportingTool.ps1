@@ -1,3 +1,10 @@
+<#
+	Azure Cost Optimization Reporting Tool
+	Version: v1.0
+	Module: Deploy-AzureCostOptimizationReportingTool.ps1
+	Author: Marc Steene
+#>
+
 $ErrorActionPreference = "Stop"
 
 Write-Host "Reading and validating configuration file..." -ForegroundColor Yellow
@@ -110,7 +117,7 @@ New-AzAutomationAccount -Name $configAutomationAccountName `
                         -Location $configDeploymentLocation
 
 Write-Host "[7/18] Registering modules on automation account..." -ForegroundColor Yellow
-$module = Find-Module az.MonitoringSolutions
+$module = Find-Module az.ResourceGraph
 New-AzAutomationModule -AutomationAccountName $configAutomationAccountName -ResourceGroupName $configResourceGroupName -Name $module.Name -ContentLinkUri "$($module.RepositorySourceLocation)/package/$($module.Name)/$($module.Version)"                        
 
 Write-Host "[8/18] Enabling Managed Identity on Automation Account..." -ForegroundColor Yellow

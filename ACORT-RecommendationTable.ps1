@@ -1,3 +1,10 @@
+<#
+	Azure Cost Optimization Reporting Tool
+	Version: v1.0
+	Module: ACORT-RecommendationTable.ps1
+	Author: Marc Steene
+#>
+
 $recommendationTable = @{
 	"UnattachedPublicIp" = @{
 		RecommendationDescription = "Delete unattached Public IP address"

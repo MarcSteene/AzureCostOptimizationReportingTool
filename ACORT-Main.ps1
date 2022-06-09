@@ -1,3 +1,10 @@
+<#
+	Azure Cost Optimization Reporting Tool
+	Version: v1.0
+	Module: ACORT-Main.ps1
+	Author: Marc Steene
+#>
+
 $VerbosePreference = "SilentlyContinue"
 
 Write-Verbose "Starting..." -Verbose
