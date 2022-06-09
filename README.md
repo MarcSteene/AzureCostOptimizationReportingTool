@@ -109,7 +109,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
 
-## <a id="ugprade"></a> Upgrade Guide
+## <a id="upgrade"></a> Upgrade Guide
 1. Navigate to the Azure Portal
 2. Delete the Resource Group containing the tool's resources from the previous deployment
 3. Follow the deployment guide to deploy the latest version
