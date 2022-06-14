@@ -22,7 +22,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Imports all Azure Advisor cost recommendations (reserved instances, VM SKU size etc.)
 
 ### Orphaned Resources
-* Unattached Public IP adresses
+* Unattached Public IP addresses
 * Unattached Managed Disks
 * VMs deallocated for more than 90 days
 * Snapshots older than 1 year
@@ -50,7 +50,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ### Non-Production Subscription Optimizations
 * No use of Dev/Test subscription offer
-* VMs in Dev/Test subscriptions without an autoshutdown schedule
+* VMs in Dev/Test subscriptions without an auto-shutdown schedule
 * Recovery Services Vaults in Dev/Test subscriptions using Geo-Redundant Storage (GRS)
 * Premium SKU Managed Disks in Dev/Test subscriptions
 * Premium SKU Storage Accounts in Dev/Test subscriptions
