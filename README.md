@@ -23,7 +23,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ### Orphaned Resources
 * Unattached Public IP adresses
-* Uattached Managed Disks
+* Unattached Managed Disks
 * VMs deallocated for more than 90 days
 * Snapshots older than 1 year
 * Empty Availability Sets
