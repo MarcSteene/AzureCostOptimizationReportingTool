@@ -112,7 +112,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ## <a id="changelog"></a> Change Log
 
-v1.01: Fix SQL MI name issue due to incorrect property reference
+v1.01: Fix SQL MI name error due to incorrect property reference
 
 ## <a id="upgrade"></a> Upgrade Guide
 1. Navigate to the Azure Portal
