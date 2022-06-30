@@ -1,4 +1,4 @@
-# Azure Cost Optimization Reporting Tool (v1.0)
+# Azure Cost Optimization Reporting Tool (v1.01)
 The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool designed to improve the cost efficiency of your Azure deployments. It performs a multi-subscription assessment of your Azure resources against Microsoft's cost optimization best practices defined in the [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/cost/) and [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/get-started/manage-costs). A recurring email report is generated containing optimizations for each subscription with associated cost data pulled from the previous month.
 
 * Assess your Azure workloads against 32 Microsoft cost optimization best practices scoped to subscriptions, management groups, or the entire tenant.
@@ -11,6 +11,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * [Assessment Scope](#assessmentscope)
 * [Prerequisites](#prerequisites)
 * [Deployment Guide](#deployment)
+* [Change Log](#changelog)
 * [Upgrade Guide](#upgrade)
 * [Example Reports](#examplereports)
 * [Troubleshooting](#troubleshooting)
@@ -108,6 +109,10 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 <br>![](./docs/startRunbook.jpg)</br>
 16. This will trigger a manual report generation. After a few minutes the configured recipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
+
+## <a id="changelog"></a> Change Log
+
+v1.01: Fix SQL MI name issue due to incorrect property reference
 
 ## <a id="upgrade"></a> Upgrade Guide
 1. Navigate to the Azure Portal
