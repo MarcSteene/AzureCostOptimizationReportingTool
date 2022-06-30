@@ -9,9 +9,9 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ## Table of Contents
 * [Assessment Scope](#assessmentscope)
+* [Change Log](#changelog)
 * [Prerequisites](#prerequisites)
 * [Deployment Guide](#deployment)
-* [Change Log](#changelog)
 * [Upgrade Guide](#upgrade)
 * [Example Reports](#examplereports)
 * [Troubleshooting](#troubleshooting)
@@ -68,6 +68,10 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Legacy v1 Storage Accounts
 * Storage Accounts without data lifecycle management rules
 
+## <a id="changelog"></a> Change Log
+
+v1.01: Fix SQL MI name error due to incorrect property reference
+
 ## <a id="prerequisites"></a> Prerequisites
 * A user with the `Contributor` role on a subscription to deploy the resources.
 * A user with a mailbox to send the email report.
@@ -109,10 +113,6 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 <br>![](./docs/startRunbook.jpg)</br>
 16. This will trigger a manual report generation. After a few minutes the configured recipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
-
-## <a id="changelog"></a> Change Log
-
-v1.01: Fix SQL MI name error due to incorrect property reference
 
 ## <a id="upgrade"></a> Upgrade Guide
 1. Navigate to the Azure Portal
