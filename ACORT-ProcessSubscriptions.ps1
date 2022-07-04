@@ -1,6 +1,6 @@
 <#
 	Azure Cost Optimization Reporting Tool
-	Version: v1.0
+	Version: v1.01
 	Module: ACORT-ProcessSubscriptions.ps1
 	Author: Marc Steene
 #>

@@ -1,6 +1,6 @@
 <#
 	Azure Cost Optimization Reporting Tool
-	Version: v1.0
+	Version: v1.01
 	Module: ACORT-Functions.ps1
 	Author: Marc Steene
 #>
@@ -825,7 +825,7 @@ function Add-NonAHBSqlManagedInstanceRecommendations {
 		Add-Recommendation `
 		-SubscriptionName $subscriptionName `
 		-ResourceId $_.Id `
-		-ResourceName $_.Name `
+		-ResourceName $_.ManagedInstanceName `
 		-ResourceGroupName $_.ResourceGroupName `
 		-RecommendationType "SQLManagedInstanceHybridBenefit"
 	}

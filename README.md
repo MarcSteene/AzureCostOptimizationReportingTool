@@ -1,4 +1,4 @@
-# Azure Cost Optimization Reporting Tool
+# Azure Cost Optimization Reporting Tool (v1.0)
 The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool designed to improve the cost efficiency of your Azure deployments. It performs a multi-subscription assessment of your Azure resources against Microsoft's cost optimization best practices defined in the [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/cost/) and [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/get-started/manage-costs). A recurring email report is generated containing optimizations for each subscription with associated cost data pulled from the previous month.
 
 * Assess your Azure workloads against 32 Microsoft cost optimization best practices scoped to subscriptions, management groups, or the entire tenant.
@@ -11,6 +11,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * [Assessment Scope](#assessmentscope)
 * [Prerequisites](#prerequisites)
 * [Deployment Guide](#deployment)
+* [Upgrade Guide](#upgrade)
 * [Example Reports](#examplereports)
 * [Troubleshooting](#troubleshooting)
 * [Disclaimer](#disclaimer)
@@ -21,8 +22,8 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 * Imports all Azure Advisor cost recommendations (reserved instances, VM SKU size etc.)
 
 ### Orphaned Resources
-* Unattached Public IP adresses
-* Uattached Managed Disks
+* Unattached Public IP addresses
+* Unattached Managed Disks
 * VMs deallocated for more than 90 days
 * Snapshots older than 1 year
 * Empty Availability Sets
@@ -49,7 +50,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ### Non-Production Subscription Optimizations
 * No use of Dev/Test subscription offer
-* VMs in Dev/Test subscriptions without an autoshutdown schedule
+* VMs in Dev/Test subscriptions without an auto-shutdown schedule
 * Recovery Services Vaults in Dev/Test subscriptions using Geo-Redundant Storage (GRS)
 * Premium SKU Managed Disks in Dev/Test subscriptions
 * Premium SKU Storage Accounts in Dev/Test subscriptions
@@ -77,7 +78,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 1. Open the Azure Portal and open a Cloud Shell (PowerShell). If this is your first time using Cloud Shell, it may require set up.
 <br>![](./docs/cloudShell.jpg)</br>
 2. Run `git clone https://github.com/MarcSteene/AzureCostOptimizationReportingTool.git azurecostoptimizationreportingtool`
-<br>![](.docs/gitClone.jpg)</br>
+<br>![](./docs/gitClone.jpg)</br>
 3. Run `cd ./azurecostoptimizationreportingtool/`
 4. Run `code config.txt`
 5. Update the configuration as required:
@@ -105,8 +106,13 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 <br>![](./docs/managedIdentity2.jpg)</br>
 15. Once the `Reader` role has been assigned to the desired assessment scopes, navigate to the `ACORT-Main` runbook and select `Start`.
 <br>![](./docs/startRunbook.jpg)</br>
-16. This will trigger a manual report generation. After a few minutes the configured receipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
+16. This will trigger a manual report generation. After a few minutes the configured recipients should receive the report attachment via email. For large environments with many subscriptions this could take up to an hour.
 17. If the email report is not received, refer to the troubleshooting steps below.
+
+## <a id="upgrade"></a> Upgrade Guide
+1. Navigate to the Azure Portal
+2. Delete the Resource Group containing the tool's resources from the previous deployment
+3. Follow the deployment guide to deploy the latest version
 
 ## <a id="examplereports"></a> Example Reports
 <b>Summary Report</b>
