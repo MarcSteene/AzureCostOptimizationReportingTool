@@ -292,11 +292,10 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 	Write-Verbose "Checking Sentinel Workspaces for commitment tier right-size......" -Verbose
 
 	$query = @'
-		Usage
-		| where TimeGenerated > ago(31d) and TimeGenerated < ago(1d)
-		| where IsBillable == True
-		| summarize TotalGBytes =round(sum(Quantity/(1024)),2) by bin(TimeGenerated, 1d)
-		| summarize ['gbperday'] =round(avg(TotalGBytes),2)
+	Usage
+	| where TimeGenerated > ago(31d) and TimeGenerated < ago(1d)
+	| where IsBillable == True
+	| summarize TotalGBytes =round(sum(Quantity/(1024)),2) by bin(TimeGenerated, 1d)
 '@
 
 	$uri = "https://prices.azure.com/api/retail/prices?`$filter=serviceName eq 'Sentinel'"
@@ -314,50 +313,59 @@ function Add-SentinelWorkspaceCommitmentTierRecommendations {
 		$sentinelSolution = Search-AzGraph -Query "resources | where type =~ 'microsoft.operationsmanagement/solutions' | where subscriptionId =~ '$subscriptionId' | where name =~ 'SecurityInsights($workspaceName)'"
 		
 		if($sentinelSolution.Count -gt 0) {
-			$averageDailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.gbperday
+			$dailyIngestion = (Invoke-AzOperationalInsightsQuery -WorkspaceId $_.CustomerId -Query $query -Wait 120 | Select-Object Results).Results.TotalGBytes
 
-			if($averageDailyIngestion -ne "NaN") {
-				$location = $_.Location
-				$localPrices = $sentinelPricing | Where-Object { $_.armRegionName -eq $location }
+			$location = $_.Location
+			$localPrices = $sentinelPricing | Where-Object { $_.armRegionName -eq $location }
 
-				$priceHash = @{}
+			$priceHash = @{}
 
-				$localPrices | ForEach-Object {
-					if($_.skuName -eq "Pay-as-you-go") {
-						$priceHash["PAYG"] = $_.retailPrice * $averageDailyIngestion
-					}
-					elseif($_.skuName.Contains("Commitment")) {
-						$capacity = [int]($_.skuName -split " GB")[0]
-						$perGbPrice = $_.retailPrice / $capacity
-						$priceHash[$capacity] = $_.retailPrice + ([math]::max(0, ($averageDailyIngestion - $capacity)) * $perGbPrice) 
+			$localPrices | ForEach-Object {
+				if($_.skuName -eq "Pay-as-you-go") {
+					$priceHash["PAYG"] = 0
+					foreach($di in $dailyIngestion) {
+						$priceHash["PAYG"] += $_.retailPrice * $di
 					}
 				}
-
-				$lowestCost = ($priceHash.Values | Measure-Object -Minimum).Minimum
-		
-				$priceHash.Keys | ForEach-Object {
-					if($priceHash[$_] -eq $lowestCost) {
-						$optimalTier = $_
-					}
+				elseif($_.skuName.Contains("Commitment")) {
+					$capacity = [int]($_.skuName -split " GB")[0]
+					$perGbPrice = $_.retailPrice / $capacity
+					$priceHash[$capacity] = 0
+					foreach($di in $dailyIngestion) {
+						$priceHash[$capacity] += $_.retailPrice + ([math]::max(0, ($di - $capacity)) * $perGbPrice) 
+					}	
 				}
+			}
 
-				if(($sentinelSolution.properties.Sku.Name -eq "PerGB" -and $optimalTier -ne "PAYG") -or ($sentinelSolution.properties.Sku.Name -eq "CapacityReservation" -and $optimalTier -eq "PAYG") -or ($sentinelSolution.properties.Sku.Name -eq "CapacityReservation" -and $sentinelSolution.properties.Sku.CapacityReservationLevel -ne $optimalTier)) {
-					if($sentinelSolution.properties.Sku.Name -eq "PerGB") {
-						$currentCost = $priceHash["PAYG"]
-					} elseif($sentinelSolution.properties.Sku.Name -eq "CapacityReservation") {
-						$currentCost = $priceHash[$sentinelSolution.properties.Sku.CapacityReservationLevel]
-					}
-					
-					$savingsRatio = ($currentCost - $priceHash[$optimalTier]) / $currentCost
-					
-					Add-Recommendation `
-					-SubscriptionName $subscriptionName `
-					-ResourceId $_.ResourceId `
-					-ResourceName $_.Name `
-					-ResourceGroupName $_.ResourceGroupName `
-					-RecommendationType "SentinelWorkspaceCommitmentTier$optimalTier" `
-					-SavingsRatio $savingsRatio
+			$lowestCost = ($priceHash.Values | Measure-Object -Minimum).Minimum
+	
+            if($lowestCost -eq 0) {
+                $optimalTier = "PAYG"
+            }
+            else {
+                $priceHash.Keys | ForEach-Object {
+                    if($priceHash[$_] -eq $lowestCost) {
+                        $optimalTier = $_
+                    }
+                }
+            }
+
+			if(($sentinelSolution.properties.Sku.Name -eq "PerGB" -and $optimalTier -ne "PAYG") -or ($sentinelSolution.properties.Sku.Name -eq "CapacityReservation" -and $optimalTier -eq "PAYG") -or ($sentinelSolution.properties.Sku.Name -eq "CapacityReservation" -and $sentinelSolution.properties.Sku.CapacityReservationLevel -ne $optimalTier)) {
+				if($sentinelSolution.properties.Sku.Name -eq "PerGB") {
+					$currentCost = $priceHash["PAYG"]
+				} elseif($sentinelSolution.properties.Sku.Name -eq "CapacityReservation") {
+					$currentCost = $priceHash[$sentinelSolution.properties.Sku.CapacityReservationLevel]
 				}
+				
+				$savingsRatio = ($currentCost - $priceHash[$optimalTier]) / $currentCost
+				
+				Add-Recommendation `
+				-SubscriptionName $subscriptionName `
+				-ResourceId $_.ResourceId `
+				-ResourceName $_.Name `
+				-ResourceGroupName $_.ResourceGroupName `
+				-RecommendationType "SentinelWorkspaceCommitmentTier$optimalTier" `
+				-SavingsRatio $savingsRatio
 			}
 		}
 	}
