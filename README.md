@@ -1,4 +1,4 @@
-# Azure Cost Optimization Reporting Tool (v1.01)
+# Azure Cost Optimization Reporting Tool (v1.02)
 The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool designed to help Azure consumers improve the cost efficiency of their deployments. It performs a multi-subscription assessment of your Azure resources against Microsoft's cost optimization best practices defined in the [Well-Architected Framework](https://docs.microsoft.com/en-us/azure/architecture/framework/cost/) and [Cloud Adoption Framework](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/get-started/manage-costs). A recurring email report is generated containing optimizations for each subscription with associated cost data pulled from the previous month.
 
 * Assess your Azure workloads against 32 Microsoft cost optimization best practices scoped to subscriptions, management groups, or the entire tenant.
@@ -34,7 +34,7 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ### Sentinel
 * Sentinel Workspaces with a retention period configured beyond free period (> 90 days)
-* Sentinel Workspaces not using an optimal commitment tier based on average daily data ingestion
+* Sentinel Workspaces not using an optimal commitment tier based on previous 31 days of ingestion
 
 ### Log Analytics
 * Log Analytics Workspaces with a retention period configured beyond free period (> 31 days)
