@@ -1,6 +1,6 @@
 <#
 	Azure Cost Optimization Reporting Tool
-	Version: v1.01
+	Version: v1.02
 	Module: ACORT-Functions.ps1
 	Author: Marc Steene
 #>
