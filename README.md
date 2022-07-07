@@ -70,8 +70,8 @@ The Azure Cost Optimization Reporting Tool (ACORT) is a free, open-source tool d
 
 ## <a id="changelog"></a> Change Log
 
-v1.01: Fix SQL MI name error due to incorrect property reference
-v1.02: Change Sentinel commitment tier logic from daily average to cumulative
+* v1.01: Fix SQL MI name error due to incorrect property reference
+* v1.02: Change Sentinel commitment tier logic from daily average to cumulative
 
 ## <a id="prerequisites"></a> Prerequisites
 * A user with the `Contributor` role on a subscription to deploy the resources.
